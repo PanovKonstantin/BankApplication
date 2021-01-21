@@ -380,6 +380,15 @@ public class App extends JFrame implements ActionListener {
             add(pwRepeatText);
             add(message);
             add(submit);
+            firstNameText.addActionListener(this);
+            secondNameText.addActionListener(this);
+            userNameText.addActionListener(this);
+            emailText.addActionListener(this);
+            addressText.addActionListener(this);
+            birthdateText.addActionListener(this);
+            phoneText.addActionListener(this);
+            passwordText.addActionListener(this);
+            pwRepeatText.addActionListener(this);
             submit.addActionListener(this);
         }
 
