@@ -271,7 +271,7 @@ public class App extends JFrame implements ActionListener {
             String phone = phoneText.getText();
             String password = new String(passwordText.getPassword());
             String pwRepeat = new String(pwRepeatText.getPassword());
-            conn.addUser(firstName, secondName, username, email, address, birthdate, phone, password, pwRepeat);
+            conn.addClient(firstName, secondName, username, email, address, birthdate, phone, password, pwRepeat);
         }
     }
 
@@ -282,7 +282,7 @@ public class App extends JFrame implements ActionListener {
         App app = new App();
         app.conn = new ConnectionDatabase();
         app.generator = new AccountGenerator();
-        app.generateAccounts(5);
+        // app.generateAccounts(5);
     }
 
     public void generateAccounts(int number) {
