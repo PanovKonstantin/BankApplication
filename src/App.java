@@ -8,6 +8,7 @@ public class App extends JFrame implements ActionListener {
     LoginSignupTabbedPane loginSignupTP;
     HomeTabbedPane homeTP;
     ConnectionDatabase conn;
+    AccountGenerator generator;
 
     App() {
         super("Bank Application");
@@ -280,11 +281,11 @@ public class App extends JFrame implements ActionListener {
     public static void main(String[] args) {
         App app = new App();
         app.conn = new ConnectionDatabase();
+        app.generator = new AccountGenerator();
         app.generateAccounts(5);
     }
 
     public void generateAccounts(int number) {
-        AccountGenerator generator = new AccountGenerator();
         String[] accounts = new String[number];
         for (int i = 0; i < number; i++) {
             accounts[i] = generator.generateAccount();
