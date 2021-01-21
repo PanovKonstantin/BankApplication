@@ -27,36 +27,37 @@ public class ConnectionDatabase {
         }
     }
 
-    public int addUser(String firstName, String secondName, String username, String email, String address,
+    public boolean addClient(String firstName, String lastName, String username, String email, String address,
             String birthdate, String phone, String password, String pwRepeat) {
+        if (!password.equals(pwRepeat))
+            return false;
         openConnection();
-        try (Statement stmt = conn.createStatement()) {
-            ResultSet rs = stmt.executeQuery("SELECT username FROM users WHERE username = '" + username + "'");
-            if (!rs.next()) {
-                
-                
-                //ADD CLIENT
-
-
-                stmt.executeUpdate(
-                        "INSERT INTO USERS " + "VALUES(seq_users.currval,'" + username + "','" + password + "')");
-                return 1;
+        try {
+            Statement statement = conn.createStatement();
+            String id = "";
+            ResultSet rs = statement.executeQuery("select seq_users.nextval from dual");
+            while (rs.next()) {
+                id = rs.getString(1);
             }
-            return 2;
+            statement.executeUpdate("INSERT INTO CLIENTS VALUES('" + id + "','" + firstName + "','" + lastName + "','"
+                    + birthdate + "','" + phone + "','" + email + "')");
+            statement.executeUpdate("INSERT INTO USERS VALUES('" + id + "','" + username + "','" + password + "')");
+            closeConnection();
+            return true;
         } catch (SQLException e) {
             System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
         closeConnection();
-        return -1;
+        return false;
     }
 
     public boolean loginUser(String username, String password) {
         openConnection();
         String query = "select ID, USERNAME, PASSWORD from USERS";
-        try (Statement stmt = conn.createStatement()) {
-            ResultSet rs = stmt.executeQuery(query);
+        try (Statement statement = conn.createStatement()) {
+            ResultSet rs = statement.executeQuery(query);
             while (rs.next()) {
                 String table_username = rs.getString("USERNAME");
                 String table_password = rs.getString("PASSWORD");
@@ -74,19 +75,22 @@ public class ConnectionDatabase {
         return false;
     }
 
-    public void addAccounts(String[] accounts) {
+    public boolean addAccounts(String[] accounts) {
         openConnection();
         try {
             Statement statement = conn.createStatement();
             for (int i = 0; i < accounts.length; i++) {
-                statement.executeUpdate("INSERT INTO ALL_ACCOUNTS " + "VALUES('" + accounts[i] + "','0')");
+                statement.executeUpdate("INSERT INTO ALL_ACCOUNTS VALUES('" + accounts[i] + "','0')");
             }
+            closeConnection();
+            return true;
         } catch (SQLException e) {
             System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
         closeConnection();
+        return false;
     }
 
 }
