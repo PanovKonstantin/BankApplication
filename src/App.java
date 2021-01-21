@@ -72,7 +72,7 @@ public class App extends JFrame implements ActionListener {
         }
     }
 
-    private class InfoPanel extends JPanel implements ActionListener{
+    private class InfoPanel extends JPanel implements ActionListener {
         JTextField accountid;
         JTextField username;
         JTextField email;
@@ -95,7 +95,8 @@ public class App extends JFrame implements ActionListener {
 
         InfoPanel() {
             super(new GridLayout(10, 2));
-            String acc = "123", usrname = "admin", fname = "admean", sname = "adminowicz", mail = "admin@idinahuj.psina", addr = "adres", bd = "66.66.6666", ph = "999-999-999";
+            String acc = "123", usrname = "admin", fname = "admean", sname = "adminowicz",
+                    mail = "admin@idinahuj.psina", addr = "adres", bd = "66.66.6666", ph = "999-999-999";
             accountid = new JTextField(acc);
             accountid.setEditable(false);
             username = new JTextField(usrname);
@@ -157,8 +158,9 @@ public class App extends JFrame implements ActionListener {
             add(savebutton);
             add(info);
         }
+
         public void actionPerformed(ActionEvent e) {
-            switch(e.getActionCommand()){
+            switch (e.getActionCommand()) {
                 case "Edit":
                     accountid.setEditable(true);
                     username.setEditable(true);
@@ -169,7 +171,7 @@ public class App extends JFrame implements ActionListener {
                     savebutton.setEnabled(true);
                     break;
                 case "Save":
-                    if(isInformationCorrect(phone.getText())){
+                    if (isInformationCorrect(phone.getText())) {
                         accountid.setEditable(false);
                         username.setEditable(false);
                         email.setEditable(false);
@@ -178,16 +180,16 @@ public class App extends JFrame implements ActionListener {
                         phone.setEditable(false);
                         savebutton.setEnabled(false);
                         info.setVisible(false);
-                    }
-                    else{
+                    } else {
                         info.setVisible(true);
                     }
                     break;
-            } 
+            }
         }
-        
-        public boolean isInformationCorrect(String a){
-            if (a.length() == 11) return true;
+
+        public boolean isInformationCorrect(String a) {
+            if (a.length() == 11)
+                return true;
             return false;
         }
 
@@ -404,10 +406,9 @@ public class App extends JFrame implements ActionListener {
             String password = new String(passwordText.getPassword());
             String pwRepeat = new String(pwRepeatText.getPassword());
 
-            if(conn.addUser(firstName, secondName, username, email, address, birthdate, phone, password,
-                    pwRepeat) == 1){
-                        loginAccount();
-                    }
+            if (conn.addClient(firstName, secondName, username, email, address, birthdate, phone, password, pwRepeat)) {
+                loginAccount();
+            }
         }
     }
 
