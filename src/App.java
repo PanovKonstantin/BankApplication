@@ -4,6 +4,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import java.util.HashMap;
+import java.util.Map;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -13,6 +15,7 @@ public class App extends JFrame implements ActionListener {
     HomeTabbedPane homeTP;
     ConnectionDatabase conn;
     AccountGenerator generator;
+
 
     App() {
         super("Bank Application");
@@ -31,8 +34,10 @@ public class App extends JFrame implements ActionListener {
         setVisible(true);
     }
 
-    public void loginAccount() {
+    public void loginAccount(int id) {
         loginSignupTP.setVisible(false);
+        Map<String, String> clientData = conn.getClientData(id);
+        System.out.println(clientData);
         homeTP.setVisible(true);
     }
 
@@ -77,7 +82,7 @@ public class App extends JFrame implements ActionListener {
         }
     }
 
-    private class InfoPanel extends JPanel implements ActionListener{
+    private class InfoPanel extends JPanel implements ActionListener {
         JTextField accountid;
         JTextField username;
         JTextField email;
@@ -100,7 +105,8 @@ public class App extends JFrame implements ActionListener {
 
         InfoPanel() {
             super(new GridLayout(10, 2));
-            String acc = "123", usrname = "admin", fname = "admean", sname = "adminowicz", mail = "admin@idinahuj.psina", addr = "adres", bd = "66.66.6666", ph = "999-999-999";
+            String acc = "123", usrname = "admin", fname = "admean", sname = "adminowicz",
+                    mail = "admin@idinahuj.psina", addr = "adres", bd = "66.66.6666", ph = "999-999-999";
             accountid = new JTextField(acc);
             accountid.setEditable(false);
             username = new JTextField(usrname);
@@ -162,8 +168,9 @@ public class App extends JFrame implements ActionListener {
             add(savebutton);
             add(info);
         }
+
         public void actionPerformed(ActionEvent e) {
-            switch(e.getActionCommand()){
+            switch (e.getActionCommand()) {
                 case "Edit":
                     accountid.setEditable(true);
                     username.setEditable(true);
@@ -174,7 +181,7 @@ public class App extends JFrame implements ActionListener {
                     savebutton.setEnabled(true);
                     break;
                 case "Save":
-                    if(isInformationCorrect(phone.getText())){
+                    if (isInformationCorrect(phone.getText())) {
                         accountid.setEditable(false);
                         username.setEditable(false);
                         email.setEditable(false);
@@ -183,18 +190,18 @@ public class App extends JFrame implements ActionListener {
                         phone.setEditable(false);
                         savebutton.setEnabled(false);
                         info.setVisible(false);
-                    }
-                    else{
+                    } else {
                         info.setVisible(true);
                     }
                     break;
                 default:
                     break;
-            } 
+            }
         }
-        
-        public boolean isInformationCorrect(String a){
-            if (a.length() == 11) return true;
+
+        public boolean isInformationCorrect(String a) {
+            if (a.length() == 11)
+                return true;
             return false;
         }
 
@@ -239,7 +246,7 @@ public class App extends JFrame implements ActionListener {
         }
     }
 
-    private class SavingsPanel extends JPanel implements ActionListener{
+    private class SavingsPanel extends JPanel implements ActionListener {
         JLabel amountLabel;
         JTextField amount;
         JButton transferTo;
@@ -248,17 +255,17 @@ public class App extends JFrame implements ActionListener {
 
         SavingsPanel() {
             super(new BorderLayout());
-            
+
             transferTo = new JButton("Transfer to selected account");
             transferFrom = new JButton("Transfer from selected account");
             amountLabel = new JLabel("Amount");
             amount = new JTextField();
 
             DefaultTableModel savingsTM = new DefaultTableModel();
-            savingsTM.setDataVector(new Object[][] {
-                {"Konto 1", 123123, 1000, 3, new JRadioButton()},
-                {"Konto 2", 1123, 13000, 11, new JRadioButton()}
-            }, new Object[] {"Name", "Number", "Balance", "Percent", "Select"});
+            savingsTM.setDataVector(
+                    new Object[][] { { "Konto 1", 123123, 1000, 3, new JRadioButton() },
+                            { "Konto 2", 1123, 13000, 11, new JRadioButton() } },
+                    new Object[] { "Name", "Number", "Balance", "Percent", "Select" });
             savings = new JTable(savingsTM) {
                 public void tableChanged(TableModelEvent tme) {
                     super.tableChanged(tme);
@@ -266,15 +273,14 @@ public class App extends JFrame implements ActionListener {
                 }
             };
             ButtonGroup bg = new ButtonGroup();
-            bg.add((JRadioButton)savingsTM.getValueAt(0, 4));
-            bg.add((JRadioButton)savingsTM.getValueAt(1, 4));
+            bg.add((JRadioButton) savingsTM.getValueAt(0, 4));
+            bg.add((JRadioButton) savingsTM.getValueAt(1, 4));
             savings.getColumn("Select").setCellRenderer(new RadioButtonRenderer());
             savings.getColumn("Select").setCellEditor(new RadioButtonEditor(new JCheckBox()));
             JScrollPane sp = new JScrollPane(savings);
             add(sp, BorderLayout.CENTER);
             transferTo.addActionListener(this);
             transferFrom.addActionListener(this);
-
 
             JPanel p = new JPanel(new GridLayout(2, 2));
             p.add(amountLabel);
@@ -286,17 +292,16 @@ public class App extends JFrame implements ActionListener {
         }
 
         public void actionPerformed(ActionEvent e) {
-            switch(e.getActionCommand()){
+            switch (e.getActionCommand()) {
                 case "Transfer to selected account":
                     break;
                 case "Transfer from selected account":
                     break;
                 default:
                     break;
-            } 
+            }
         }
 
-        
     }
 
     private class LoginSignupTabbedPane extends JTabbedPane {
@@ -355,9 +360,10 @@ public class App extends JFrame implements ActionListener {
             String userName = userNameText.getText();
             String password = new String(passwordText.getPassword());
 
-            if (conn.loginUser(userName, password)) {
+            int id = conn.loginUser(userName, password);
+            if (id != -1) {
                 message.setText(" Hello " + userName + "");
-                loginAccount();
+                loginAccount(id);
             } else {
                 message.setText(" Invalid user.. ");
             }
@@ -471,8 +477,10 @@ public class App extends JFrame implements ActionListener {
             String password = new String(passwordText.getPassword());
             String pwRepeat = new String(pwRepeatText.getPassword());
 
-            if (conn.addClient(firstName, secondName, username, email, address, birthdate, phone, password, pwRepeat)) {
-                loginAccount();
+            int id = conn.addClient(firstName, secondName, username, email, address, birthdate, phone, password,
+                    pwRepeat);
+            if (id != -1) {
+                loginAccount(id);
             }
 
         }
@@ -499,27 +507,35 @@ public class App extends JFrame implements ActionListener {
 }
 
 class RadioButtonRenderer implements TableCellRenderer {
-   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,        boolean hasFocus, int row, int column) {
-      if (value==null) return null;
-         return (Component)value;
-   }
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
+            int row, int column) {
+        if (value == null)
+            return null;
+        return (Component) value;
+    }
 }
+
 class RadioButtonEditor extends DefaultCellEditor implements ItemListener {
-   private JRadioButton button;
-   public RadioButtonEditor(JCheckBox checkBox) {
-      super(checkBox);
-   }
-   public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-      if (value==null) return null;
-      button = (JRadioButton)value;
-      button.addItemListener(this);
-      return (Component)value;
-   }
-   public Object getCellEditorValue() {
-      button.removeItemListener(this);
-      return button;
-   }
-   public void itemStateChanged(ItemEvent e) {
-      super.fireEditingStopped();
-   }
+    private JRadioButton button;
+
+    public RadioButtonEditor(JCheckBox checkBox) {
+        super(checkBox);
+    }
+
+    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+        if (value == null)
+            return null;
+        button = (JRadioButton) value;
+        button.addItemListener(this);
+        return (Component) value;
+    }
+
+    public Object getCellEditorValue() {
+        button.removeItemListener(this);
+        return button;
+    }
+
+    public void itemStateChanged(ItemEvent e) {
+        super.fireEditingStopped();
+    }
 }
