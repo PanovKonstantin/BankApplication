@@ -16,7 +16,6 @@ public class App extends JFrame implements ActionListener {
     ConnectionDatabase conn;
     AccountGenerator generator;
 
-
     App() {
         super("Bank Application");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -38,21 +37,32 @@ public class App extends JFrame implements ActionListener {
         loginSignupTP.setVisible(false);
         Map<String, String> clientData = conn.getClientData(id);
         System.out.println(clientData);
+        homeTP.home.balance.setText(clientData.get("BANK_ACCOUNT_FUNDS"));
+        homeTP.info.name.setText(clientData.get("FIRST_NAME"));
+        homeTP.info.surname.setText(clientData.get("LAST_NAME"));
+        homeTP.info.birthdate.setText(clientData.get("BIRTH_DATE"));
+        homeTP.info.email.setText(clientData.get("EMAIL"));
+        homeTP.info.phone.setText(clientData.get("PHONE_NUMBER"));
+        homeTP.info.accountid.setText(clientData.get("ID"));
         homeTP.setVisible(true);
     }
 
     private class HomeTabbedPane extends JTabbedPane {
+        HomePanel home;
+        InfoPanel info;
+        SavingsPanel savings;
+
         HomeTabbedPane() {
             super();
             setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
-            JPanel home = new HomePanel();
+            home = new HomePanel();
             add("Home", home);
 
-            JPanel info = new InfoPanel();
+            info = new InfoPanel();
             add("Information", info);
 
-            JPanel savings = new SavingsPanel();
+            savings = new SavingsPanel();
             add("Savings", savings);
         }
     }
