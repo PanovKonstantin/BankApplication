@@ -1,4 +1,4 @@
 Zespół:
 Aliaksandr Marchuk
 Konstantin Panov
-Aleh Lotchanka
+Aleh Iotchanka
