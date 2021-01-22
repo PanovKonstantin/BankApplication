@@ -30,7 +30,7 @@ public class ConnectionDatabase {
         }
     }
 
-    public int addClient(String firstName, String lastName, String username, String email, String address,
+    public int addClient(String firstName, String secondName, String username, String email, String address,
             String birthdate, String phone, String password, String pwRepeat) {
         if (!password.equals(pwRepeat))
             return -1;
@@ -57,7 +57,7 @@ public class ConnectionDatabase {
             statement.executeUpdate("UPDATE ALL_ACCOUNTS SET IN_USE = 1 WHERE BANK_ACCOUNT=" + bankAccount);
             statement.executeUpdate("UPDATE ALL_ACCOUNTS SET IN_USE = 1 WHERE BANK_ACCOUNT=" + savingBankAccount);
 
-            statement.executeUpdate("INSERT INTO CLIENTS VALUES('" + id + "','" + firstName + "','" + lastName + "','"
+            statement.executeUpdate("INSERT INTO CLIENTS VALUES('" + id + "','" + firstName + "','" + secondName + "','"
                     + birthdate + "','" + phone + "','" + email + "')");
             statement.executeUpdate("INSERT INTO BANK_ACCOUNTS VALUES('" + id + "','" + bankAccount + "','"
                     + Integer.toString(rand.nextInt(5000)) + "')");
@@ -123,17 +123,18 @@ public class ConnectionDatabase {
         try {
             Statement statement = conn.createStatement();
             String firstName = "", secondName = "", birthDate = "", phoneNumber = "", email = "", bankAccount = "",
-                    savingBankAccount = "", bankAccountFunds = "", savingBankAccountFunds = "";
+                    savingBankAccount = "", bankAccountFunds = "", savingBankAccountFunds = "", username = "",
+                    password = "";
             ResultSet rs = statement.executeQuery("select * from clients where id=" + clientID);
             while (rs.next()) {
                 firstName = rs.getString("FIRST_NAME");
-                secondName = rs.getString("LAST_NAME");
-                birthDate = rs.getString("BIRTH_DATE");
+                secondName = rs.getString("SECOND_NAME");
+                birthDate = rs.getDate("BIRTH_DATE").toString();
                 phoneNumber = rs.getString("PHONE_NUMBER");
                 email = rs.getString("EMAIL");
             }
             clientData.put("FIRST_NAME", firstName);
-            clientData.put("LAST_NAME", secondName);
+            clientData.put("SECOND_NAME", secondName);
             clientData.put("BIRTH_DATE", birthDate);
             clientData.put("PHONE_NUMBER", phoneNumber);
             clientData.put("EMAIL", email);
@@ -153,6 +154,14 @@ public class ConnectionDatabase {
             }
             clientData.put("SAVING_BANK_ACCOUNT", savingBankAccount);
             clientData.put("SAVING_BANK_ACCOUNT_FUNDS", savingBankAccountFunds);
+
+            rs = statement.executeQuery("SELECT * FROM USERS WHERE ID=" + clientID);
+            while (rs.next()) {
+                username = rs.getString("USERNAME");
+                password = rs.getString("PASSWORD");
+            }
+            clientData.put("USERNAME", username);
+            clientData.put("PASSWORD", password);
 
         } catch (SQLException e) {
             System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
