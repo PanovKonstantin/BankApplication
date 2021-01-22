@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.Random;
 
 public class ConnectionDatabase {
 
@@ -35,12 +36,31 @@ public class ConnectionDatabase {
         try {
             Statement statement = conn.createStatement();
             String id = "";
+            String bankAccount = "";
+            String savingBankAccount = "";
+            Random rand = new Random();
             ResultSet rs = statement.executeQuery("select seq_users.nextval from dual");
             while (rs.next()) {
-                id = rs.getString(1);
+                id = rs.getString(1); // getting client id
             }
+            rs = statement.executeQuery("select BANK_ACCOUNT, IN_USE from ALL_ACCOUNTS where IN_USE=0");
+            while (rs.next()) {
+                bankAccount = rs.getString("BANK_ACCOUNT"); // getting bank account
+                break;
+            }
+            while (rs.next()) {
+                savingBankAccount = rs.getString("BANK_ACCOUNT"); // getting saving bank account
+                break;
+            }
+            statement.executeUpdate("UPDATE ALL_ACCOUNTS SET IN_USE = 1 WHERE BANK_ACCOUNT=" + bankAccount);
+            statement.executeUpdate("UPDATE ALL_ACCOUNTS SET IN_USE = 1 WHERE BANK_ACCOUNT=" + savingBankAccount);
+
             statement.executeUpdate("INSERT INTO CLIENTS VALUES('" + id + "','" + firstName + "','" + lastName + "','"
-                    + birthdate + "','" + phone + "','" + email + "')");
+            + birthdate + "','" + phone + "','" + email + "')");
+            statement.executeUpdate("INSERT INTO BANK_ACCOUNTS VALUES('" + id + "','" + bankAccount + "','"
+                    + Integer.toString(rand.nextInt(5000)) + "')");
+            statement.executeUpdate("INSERT INTO SAVING_BANK_ACCOUNTS VALUES('" + id + "','" + savingBankAccount + "','"
+                    + Integer.toString(rand.nextInt(50000)) + "')");
             statement.executeUpdate("INSERT INTO USERS VALUES('" + id + "','" + username + "','" + password + "')");
             closeConnection();
             return true;
