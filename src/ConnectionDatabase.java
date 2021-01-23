@@ -40,24 +40,15 @@ public class ConnectionDatabase {
         try {
             Statement statement = conn.createStatement();
             String id = "";
-<<<<<<< HEAD
-=======
-
->>>>>>> 7cd67d461ffb261d194b8c4d472842e651cd8df7
             String bankAccount = "";
             String savingBankAccount = "";
             Random rand = new Random();
             ResultSet rs = statement.executeQuery("SELECT SEQ_USERS.NEXTVAL FROM DUAL");
             while (rs.next()) {
-<<<<<<< HEAD
-                id = rs.getString(1); // getting client id
-            }
-=======
 
                 id = rs.getString(1); // getting client id
             }
 
->>>>>>> 7cd67d461ffb261d194b8c4d472842e651cd8df7
             rs = statement.executeQuery("SELECT BANK_ACCOUNT, IN_USE FROM ALL_ACCOUNTS WHERE IN_USE=0");
             while (rs.next()) {
                 bankAccount = rs.getString("BANK_ACCOUNT"); // getting bank account
