@@ -93,4 +93,17 @@ public class ConnectionDatabase {
         return false;
     }
 
+    public Object[][] getSavingsInformation(int accountID){
+        // SQL
+
+        //Tymczasowe
+        return new Object[][] {
+            {"Konto 1", 123123, 1000, 3},
+            {"Konto 2", 1123, 13000, 11}
+        };
+    }
+
 }
+
+
+
