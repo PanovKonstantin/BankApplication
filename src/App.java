@@ -5,10 +5,10 @@ import java.util.Map;
 import java.awt.*;
 import java.awt.event.*;
 
-public class App extends JFrame{
+public class App extends JFrame {
     ConnectionDatabase conn;
     AccountGenerator generator;
-    JButton  exit;
+    JButton exit;
     LoginSignupTabbedPane loginSignupTP;
     HomeTabbedPane homeTP;
     int identificator;
@@ -21,10 +21,10 @@ public class App extends JFrame{
         setLayout(new BorderLayout());
 
         loginSignupTP = new LoginSignupTabbedPane();
-        loginSignupTP.addLoginActionListener( a -> {
-            String [] info = loginSignupTP.getLoginInfo();
+        loginSignupTP.addLoginActionListener(a -> {
+            String[] info = loginSignupTP.getLoginInfo();
             int id = conn.loginUser(info[0], info[1]);
-            switch(id){
+            switch (id) {
                 case -1:
                     loginSignupTP.loginInform("Invalide username.. ");
                     break;
@@ -33,10 +33,11 @@ public class App extends JFrame{
                     break;
             }
         });
-        loginSignupTP.addSignupActionListener( a -> {
-            String [] info = loginSignupTP.getSignupInfo();
-            int id = conn.addClient(info[0], info[1], info[2], info[3], info[4], info[5], info[6], info[7], info[8]);
-            switch (id){
+        loginSignupTP.addSignupActionListener(a -> {
+            String[] info = loginSignupTP.getSignupInfo();
+            int id = conn.addClient(info[0], info[1], info[2], info[3], info[4], info[5], info[6], info[7], info[8],
+                    info[9], info[10], info[11], info[12], info[13]);
+            switch (id) {
                 case -1:
                     loginSignupTP.signupInform("Error..");
                     break;
@@ -48,7 +49,7 @@ public class App extends JFrame{
         add(loginSignupTP);
 
         homeTP = new HomeTabbedPane();
-        
+
         homeTP.setVisible(false);
         exit = new JButton("Logout");
         exit.addActionListener( a -> logoutAccount());
@@ -97,13 +98,21 @@ public class App extends JFrame{
         homeTP.info.phone.setText(clientData.get("PHONE_NUMBER"));
         homeTP.info.accountid.setText(clientData.get("ID"));
         homeTP.info.username.setText(clientData.get("USERNAME"));
-
+        homeTP.info.address.setText(clientData.get("ADDRESS"));
         homeTP.savings.savings.setValueAt("Bank account", 0, 0);
         homeTP.savings.savings.setValueAt("Saving bank account", 1, 0);
         homeTP.savings.savings.setValueAt(clientData.get("BANK_ACCOUNT"), 0, 1);
         homeTP.savings.savings.setValueAt(clientData.get("SAVING_BANK_ACCOUNT"), 1, 1);
         homeTP.savings.savings.setValueAt(clientData.get("BANK_ACCOUNT_FUNDS"), 0, 2);
         homeTP.savings.savings.setValueAt(clientData.get("SAVING_BANK_ACCOUNT_FUNDS"), 1, 2);
+    }
+
+    public void generateAccounts(int number) {
+        String[] accounts = new String[number];
+        for (int i = 0; i < number; i++) {
+            accounts[i] = generator.generateAccount();
+        }
+        conn.addAccounts(accounts);
     }
 
     public static void main(String[] args) {
