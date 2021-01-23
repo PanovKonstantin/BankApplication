@@ -40,16 +40,13 @@ public class ConnectionDatabase {
         try {
             Statement statement = conn.createStatement();
             String id = "";
-
             String bankAccount = "";
             String savingBankAccount = "";
             Random rand = new Random();
             ResultSet rs = statement.executeQuery("SELECT SEQ_USERS.NEXTVAL FROM DUAL");
             while (rs.next()) {
-
                 id = rs.getString(1); // getting client id
             }
-
             rs = statement.executeQuery("SELECT BANK_ACCOUNT, IN_USE FROM ALL_ACCOUNTS WHERE IN_USE=0");
             while (rs.next()) {
                 bankAccount = rs.getString("BANK_ACCOUNT"); // getting bank account
@@ -70,7 +67,6 @@ public class ConnectionDatabase {
                     + Integer.toString(rand.nextInt(50000)) + "')");
             statement.executeUpdate("INSERT INTO USERS VALUES('" + id + "','" + username + "','" + password + "')");
             closeConnection();
-
             return Integer.parseInt(id);
         } catch (SQLException e) {
             System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
@@ -78,10 +74,8 @@ public class ConnectionDatabase {
             e.printStackTrace();
         }
         closeConnection();
-
         return -1;
     }
-
 
     public int loginUser(String username, String password) {
         openConnection();
