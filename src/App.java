@@ -1,9 +1,11 @@
 import javax.swing.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import java.awt.*;
 import java.awt.event.*;
 
-public class App extends JFrame implements ActionListener {
+public class App extends JFrame{
     ConnectionDatabase conn;
     AccountGenerator generator;
     JButton  exit;
@@ -21,12 +23,27 @@ public class App extends JFrame implements ActionListener {
         loginSignupTP = new LoginSignupTabbedPane();
         loginSignupTP.addLoginActionListener( a -> {
             String [] info = loginSignupTP.getLoginInfo();
-            if (conn.loginUser(info[0], info[1])) loginAccount(); 
-            else loginSignupTP.loginInform("Invalide username.. ");
+            int id = conn.loginUser(info[0], info[1]);
+            switch(id){
+                case -1:
+                    loginSignupTP.loginInform("Invalide username.. ");
+                    break;
+                default:
+                    loginAccount(id);
+                    break;
+            }
         });
         loginSignupTP.addSignupActionListener( a -> {
             String [] info = loginSignupTP.getSignupInfo();
-            if (conn.addClient(info[0], info[1], info[2], info[3], info[4], info[5], info[6], info[7], info[8])) loginAccount();
+            int id = conn.addClient(info[0], info[1], info[2], info[3], info[4], info[5], info[6], info[7], info[8]);
+            switch (id){
+                case -1:
+                    loginSignupTP.signupInform("Error..");
+                    break;
+                default:
+                    loginAccount(id);
+                    break;
+            }
         });
         add(loginSignupTP);
 
@@ -64,12 +81,6 @@ public class App extends JFrame implements ActionListener {
         exit.setVisible(true);
     }
 
-    public void logoutAccount() {
-        loginSignupTP.setVisible(true);
-        homeTP.setVisible(false);
-        exit.setVisible(false);
-    }
-
     public void generateAccounts(int number) {
         String[] accounts = new String[number];
         for (int i = 0; i < number; i++) {
@@ -78,25 +89,9 @@ public class App extends JFrame implements ActionListener {
         conn.addAccounts(accounts);
     }
 
-    public void actionPerformed(ActionEvent e) {
-        String [] info;
-        switch(e.getActionCommand()){
-            case "Login": 
-                break;
-
-            int id = conn.addClient(firstName, secondName, username, email, address, birthdate, phone, password,
-                    pwRepeat);
-            if (id != -1) {
-                loginAccount(id);
-            }
-
-            default:
-                break;
-        }
-    }
 
     public static void main(String[] args) {
         App app = new App();
-        // app.generateAccounts(5);
+
     }
 }
