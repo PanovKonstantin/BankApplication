@@ -43,8 +43,23 @@ public class App extends JFrame implements ActionListener {
         setVisible(true);
     }
 
-    public void loginAccount() {
+    public void loginAccount(int id) {
         loginSignupTP.setVisible(false);
+        Map<String, String> clientData = conn.getClientData(id);
+        homeTP.home.balance.setText(clientData.get("BANK_ACCOUNT_FUNDS"));
+        homeTP.info.name.setText(clientData.get("FIRST_NAME"));
+        homeTP.info.surname.setText(clientData.get("SECOND_NAME"));
+        homeTP.info.birthdate.setText(clientData.get("BIRTH_DATE"));
+        homeTP.info.email.setText(clientData.get("EMAIL"));
+        homeTP.info.phone.setText(clientData.get("PHONE_NUMBER"));
+        homeTP.info.accountid.setText(clientData.get("ID"));
+        homeTP.info.username.setText(clientData.get("USERNAME"));
+        homeTP.savings.savings.setValueAt("Bank account", 0, 0);
+        homeTP.savings.savings.setValueAt("Saving bank account", 1, 0);
+        homeTP.savings.savings.setValueAt(clientData.get("BANK_ACCOUNT"), 0, 1);
+        homeTP.savings.savings.setValueAt(clientData.get("SAVING_BANK_ACCOUNT"), 1, 1);
+        homeTP.savings.savings.setValueAt(clientData.get("BANK_ACCOUNT_FUNDS"), 0, 2);
+        homeTP.savings.savings.setValueAt(clientData.get("SAVING_BANK_ACCOUNT_FUNDS"), 1, 2);
         homeTP.setVisible(true);
         exit.setVisible(true);
     }
@@ -69,8 +84,11 @@ public class App extends JFrame implements ActionListener {
             case "Login": 
                 break;
 
-            case "Signup": 
-                break;
+            int id = conn.addClient(firstName, secondName, username, email, address, birthdate, phone, password,
+                    pwRepeat);
+            if (id != -1) {
+                loginAccount(id);
+            }
 
             default:
                 break;
