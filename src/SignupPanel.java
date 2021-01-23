@@ -159,12 +159,17 @@ public class SignupPanel extends JPanel {
         submit.addActionListener(l);
     }
 
-    public void clear(){
+    public void clear() {
         firstNameText.setText("");
         secondNameText.setText("");
         userNameText.setText("");
         emailText.setText("");
-        addressText.setText("");
+        countryText.setText("");
+        cityText.setText("");
+        streetText.setText("");
+        homeText.setText("");
+        apartmentText.setText("");
+        postCodeText.setText("");
         birthdateText.setText("");
         phoneText.setText("");
         passwordText.setText("");
