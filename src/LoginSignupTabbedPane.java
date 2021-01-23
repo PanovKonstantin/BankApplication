@@ -4,6 +4,7 @@ import java.awt.event.*;
 public class LoginSignupTabbedPane extends JTabbedPane {
     LoginPanel loginPanel;
     SignupPanel signupPanel;
+
     LoginSignupTabbedPane() {
         super();
         setBounds(50, 50, 200, 200);
@@ -20,15 +21,27 @@ public class LoginSignupTabbedPane extends JTabbedPane {
         add("Signup", sp);
     }
 
-    public String[] getLoginInfo() {return loginPanel.getInfo();}
+    public String[] getLoginInfo() {
+        return loginPanel.getInfo();
+    }
 
-    public void loginInform(String info) {loginPanel.inform(info);}
-    
-    public String[] getSignupInfo() {return signupPanel.getInfo();}
+    public void loginInform(String info) {
+        loginPanel.inform(info);
+    }
 
-    public void signupInform(String info) {signupPanel.inform(info);}
+    public String[] getSignupInfo() {
+        return signupPanel.getInfo();
+    }
 
-    public void addLoginActionListener(ActionListener l) {loginPanel.addActionListener(l);}
+    public void signupInform(String info) {
+        signupPanel.inform(info);
+    }
 
-    public void addSignupActionListener(ActionListener l) {signupPanel.addActionListener(l);}
+    public void addLoginActionListener(ActionListener l) {
+        loginPanel.addActionListener(l);
+    }
+
+    public void addSignupActionListener(ActionListener l) {
+        signupPanel.addActionListener(l);
+    }
 }

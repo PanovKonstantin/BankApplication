@@ -30,34 +30,23 @@ public class ConnectionDatabase {
         }
     }
 
-
-    public int addClient(String firstName, String secondName, String username, String email, String address,
-            String birthdate, String phone, String password, String pwRepeat) {
+    public int addClient(String firstName, String secondName, String username, String email, String birthdate,
+            String phone, String password, String pwRepeat, String country, String city, String street, String home,
+            String apartment, String postCode) {
         if (!password.equals(pwRepeat))
-
             return -1;
         openConnection();
         try {
             Statement statement = conn.createStatement();
             String id = "";
-<<<<<<< HEAD
-=======
-
->>>>>>> 7cd67d461ffb261d194b8c4d472842e651cd8df7
             String bankAccount = "";
             String savingBankAccount = "";
             Random rand = new Random();
             ResultSet rs = statement.executeQuery("SELECT SEQ_USERS.NEXTVAL FROM DUAL");
             while (rs.next()) {
-<<<<<<< HEAD
-                id = rs.getString(1); // getting client id
-            }
-=======
-
                 id = rs.getString(1); // getting client id
             }
 
->>>>>>> 7cd67d461ffb261d194b8c4d472842e651cd8df7
             rs = statement.executeQuery("SELECT BANK_ACCOUNT, IN_USE FROM ALL_ACCOUNTS WHERE IN_USE=0");
             while (rs.next()) {
                 bankAccount = rs.getString("BANK_ACCOUNT"); // getting bank account
@@ -77,18 +66,23 @@ public class ConnectionDatabase {
             statement.executeUpdate("INSERT INTO SAVING_BANK_ACCOUNTS VALUES('" + id + "','" + savingBankAccount + "','"
                     + Integer.toString(rand.nextInt(50000)) + "')");
             statement.executeUpdate("INSERT INTO USERS VALUES('" + id + "','" + username + "','" + password + "')");
+            statement.executeUpdate("INSERT INTO ADDRESSES VALUES('" + id + "','" + country + "','" + city + "','"
+                    + street + "','" + home + "','" + apartment + "','" + postCode + "')");
             closeConnection();
             return Integer.parseInt(id);
-        } catch (SQLException e) {
+        } catch (
+
+        SQLException e) {
             System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         closeConnection();
 
         return -1;
-    }
 
+    }
 
     public int loginUser(String username, String password) {
         openConnection();
@@ -139,8 +133,9 @@ public class ConnectionDatabase {
             Statement statement = conn.createStatement();
             String firstName = "", secondName = "", birthDate = "", phoneNumber = "", email = "", bankAccount = "",
                     savingBankAccount = "", bankAccountFunds = "", savingBankAccountFunds = "", username = "",
-                    password = "";
-            ResultSet rs = statement.executeQuery("select * from clients where id=" + clientID);
+                    password = "", address = "", country = "", city = "", street = "", home = "", apartment = "",
+                    postCode = "";
+            ResultSet rs = statement.executeQuery("SELECT * FROM CLIENTS WHERE ID=" + clientID);
             while (rs.next()) {
                 firstName = rs.getString("FIRST_NAME");
                 secondName = rs.getString("SECOND_NAME");
@@ -178,6 +173,18 @@ public class ConnectionDatabase {
             clientData.put("USERNAME", username);
             clientData.put("PASSWORD", password);
 
+            rs = statement.executeQuery("SELECT * FROM ADDRESSES WHERE ID=" + clientID);
+            while (rs.next()) {
+                country = rs.getString("COUNTRY");
+                city = rs.getString("CITY");
+                street = rs.getString("STREET");
+                home = rs.getString("HOME");
+                apartment = rs.getString("APARTMENT");
+                postCode = rs.getString("POST_CODE");
+            }
+            address = country + ", " + city + ", " + street + " " + home + ", " + apartment + ", " + postCode;
+            clientData.put("ADDRESS", address);
+
         } catch (SQLException e) {
             System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
         } catch (Exception e) {
@@ -188,4 +195,3 @@ public class ConnectionDatabase {
     }
 
 }
-
