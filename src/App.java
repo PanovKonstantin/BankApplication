@@ -64,11 +64,11 @@ public class App extends JFrame {
 
     public void loginAccount(int id) {
         identificator = id;
+        refresh();
         loginSignupTP.setVisible(false);
         homeTP.setVisible(true);
         exit.setVisible(true);
         loginSignupTP.clear();
-        refresh();
     }
 
     public void logoutAccount() {
@@ -76,9 +76,10 @@ public class App extends JFrame {
         loginSignupTP.setVisible(true);
         homeTP.setVisible(false);
         exit.setVisible(false);
-    }
+}
 
-    public void refresh() {
+
+    public void refresh(){
         Map<String, String> clientData = conn.getClientData(identificator);
 
         homeTP.home.balance.setText(clientData.get("BANK_ACCOUNT_FUNDS"));
@@ -109,6 +110,5 @@ public class App extends JFrame {
 
     public static void main(String[] args) {
         App app = new App();
-
     }
 }
