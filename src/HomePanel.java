@@ -3,7 +3,7 @@ import javax.swing.table.AbstractTableModel;
 
 import java.awt.*;
 
-public class HomePanel extends JPanel{
+public class HomePanel extends JPanel {
     JLabel balance;
     JButton transfer;
     JTable history;
@@ -27,14 +27,14 @@ public class HomePanel extends JPanel{
 
     }
 }
+
 class HistoryTableModel extends AbstractTableModel {
 
     String[] columnNames = { "Type", "From", "To", "Amount", "Date" };
     Object[][] data = { { "dasda", "asdas", "asdasd", 123213, "2112-21-41" },
-            { "dasda", "asdas", "asdasd", 123213, "2112-21-41" },
-            { "dasda", "asdas", "asdasd", 123213, "2112-21-41" },
-            { "dasda", "asdas", "asdasd", 123213, "2112-21-41" },
-            { "dasda", "asdas", "asdasd", 123213, "2112-21-41" }, { "vxvc", "xqerz", "wfda", 2222, "0000-00-00" } };
+            { "dasda", "asdas", "asdasd", 123213, "2112-21-41" }, { "dasda", "asdas", "asdasd", 123213, "2112-21-41" },
+            { "dasda", "asdas", "asdasd", 123213, "2112-21-41" }, { "dasda", "asdas", "asdasd", 123213, "2112-21-41" },
+            { "vxvc", "xqerz", "wfda", 2222, "0000-00-00" } };
 
     @Override
     public int getColumnCount() {

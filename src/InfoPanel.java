@@ -3,7 +3,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class InfoPanel extends JPanel implements ActionListener{
+public class InfoPanel extends JPanel implements ActionListener {
     JTextField accountid;
     JTextField username;
     JTextField email;
@@ -95,8 +95,9 @@ public class InfoPanel extends JPanel implements ActionListener{
         add(savebutton);
         add(info);
     }
+
     public void actionPerformed(ActionEvent e) {
-        switch(e.getActionCommand()){
+        switch (e.getActionCommand()) {
             case "Edit":
                 accountid.setEditable(true);
                 username.setEditable(true);
@@ -107,7 +108,7 @@ public class InfoPanel extends JPanel implements ActionListener{
                 savebutton.setEnabled(true);
                 break;
             case "Save":
-                if(isInformationCorrect(phone.getText())){
+                if (isInformationCorrect(phone.getText())) {
                     accountid.setEditable(false);
                     username.setEditable(false);
                     email.setEditable(false);
@@ -116,16 +117,17 @@ public class InfoPanel extends JPanel implements ActionListener{
                     phone.setEditable(false);
                     savebutton.setEnabled(false);
                     info.setVisible(false);
-                }
-                else{
+                } else {
                     info.setVisible(true);
                 }
                 break;
             default:
                 break;
-        } 
+        }
     }
-    
-    public boolean isInformationCorrect(String a){return a.length() == 11;}
+
+    public boolean isInformationCorrect(String a) {
+        return a.length() == 11;
+    }
 
 }

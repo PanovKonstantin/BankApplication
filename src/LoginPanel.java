@@ -3,7 +3,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class LoginPanel extends JPanel{
+public class LoginPanel extends JPanel {
     JLabel userLabel;
     JLabel passwordLabel;
     JLabel message;
@@ -32,9 +32,13 @@ public class LoginPanel extends JPanel{
         add(submit);
     }
 
-    public String[] getInfo() {return new String [] {userNameText.getText(), new String(passwordText.getPassword())};}
+    public String[] getInfo() {
+        return new String[] { userNameText.getText(), new String(passwordText.getPassword()) };
+    }
 
-    public void inform(String info) {message.setText(info);}
+    public void inform(String info) {
+        message.setText(info);
+    }
 
     public void addActionListener(ActionListener l) {
         submit.addActionListener(l);
