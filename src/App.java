@@ -1,9 +1,11 @@
 import javax.swing.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import java.awt.*;
 import java.awt.event.*;
 
-public class App extends JFrame implements ActionListener {
+public class App extends JFrame{
     ConnectionDatabase conn;
     AccountGenerator generator;
     JButton  exit;
@@ -21,12 +23,27 @@ public class App extends JFrame implements ActionListener {
         loginSignupTP = new LoginSignupTabbedPane();
         loginSignupTP.addLoginActionListener( a -> {
             String [] info = loginSignupTP.getLoginInfo();
-            if (conn.loginUser(info[0], info[1])) loginAccount(); 
-            else loginSignupTP.loginInform("Invalide username.. ");
+            int id = conn.loginUser(info[0], info[1]);
+            switch(id){
+                case -1:
+                    loginSignupTP.loginInform("Invalide username.. ");
+                    break;
+                default:
+                    loginAccount(id);
+                    break;
+            }
         });
         loginSignupTP.addSignupActionListener( a -> {
             String [] info = loginSignupTP.getSignupInfo();
-            if (conn.addClient(info[0], info[1], info[2], info[3], info[4], info[5], info[6], info[7], info[8])) loginAccount();
+            int id = conn.addClient(info[0], info[1], info[2], info[3], info[4], info[5], info[6], info[7], info[8]);
+            switch (id){
+                case -1:
+                    loginSignupTP.signupInform("Error..");
+                    break;
+                default:
+                    loginAccount(id);
+                    break;
+            }
         });
         add(loginSignupTP);
 
@@ -43,16 +60,25 @@ public class App extends JFrame implements ActionListener {
         setVisible(true);
     }
 
-    public void loginAccount() {
+    public void loginAccount(int id) {
         loginSignupTP.setVisible(false);
+        Map<String, String> clientData = conn.getClientData(id);
+        homeTP.home.balance.setText(clientData.get("BANK_ACCOUNT_FUNDS"));
+        homeTP.info.name.setText(clientData.get("FIRST_NAME"));
+        homeTP.info.surname.setText(clientData.get("SECOND_NAME"));
+        homeTP.info.birthdate.setText(clientData.get("BIRTH_DATE"));
+        homeTP.info.email.setText(clientData.get("EMAIL"));
+        homeTP.info.phone.setText(clientData.get("PHONE_NUMBER"));
+        homeTP.info.accountid.setText(clientData.get("ID"));
+        homeTP.info.username.setText(clientData.get("USERNAME"));
+        homeTP.savings.savings.setValueAt("Bank account", 0, 0);
+        homeTP.savings.savings.setValueAt("Saving bank account", 1, 0);
+        homeTP.savings.savings.setValueAt(clientData.get("BANK_ACCOUNT"), 0, 1);
+        homeTP.savings.savings.setValueAt(clientData.get("SAVING_BANK_ACCOUNT"), 1, 1);
+        homeTP.savings.savings.setValueAt(clientData.get("BANK_ACCOUNT_FUNDS"), 0, 2);
+        homeTP.savings.savings.setValueAt(clientData.get("SAVING_BANK_ACCOUNT_FUNDS"), 1, 2);
         homeTP.setVisible(true);
         exit.setVisible(true);
-    }
-
-    public void logoutAccount() {
-        loginSignupTP.setVisible(true);
-        homeTP.setVisible(false);
-        exit.setVisible(false);
     }
 
     public void generateAccounts(int number) {
@@ -63,22 +89,9 @@ public class App extends JFrame implements ActionListener {
         conn.addAccounts(accounts);
     }
 
-    public void actionPerformed(ActionEvent e) {
-        String [] info;
-        switch(e.getActionCommand()){
-            case "Login": 
-                break;
-
-            case "Signup": 
-                break;
-
-            default:
-                break;
-        }
-    }
 
     public static void main(String[] args) {
         App app = new App();
-        // app.generateAccounts(5);
+
     }
 }
