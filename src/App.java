@@ -11,6 +11,7 @@ public class App extends JFrame {
     JButton exit;
     LoginSignupTabbedPane loginSignupTP;
     HomeTabbedPane homeTP;
+    int identificator;
 
     App() {
         super("Bank Application");
@@ -51,6 +52,7 @@ public class App extends JFrame {
 
         homeTP.setVisible(false);
         exit = new JButton("Logout");
+        exit.addActionListener( a -> logoutAccount());
         exit.setVisible(false);
         add(exit, BorderLayout.SOUTH);
         add(homeTP, BorderLayout.CENTER);
@@ -61,9 +63,26 @@ public class App extends JFrame {
     }
 
     public void loginAccount(int id) {
+        identificator = id;
         loginSignupTP.setVisible(false);
-        Map<String, String> clientData = conn.getClientData(id);
+        homeTP.setVisible(true);
+        exit.setVisible(true);
+        loginSignupTP.clear();
+    }
+
+    public void logoutAccount() {
+        identificator = 0;
+        loginSignupTP.setVisible(true);
+        homeTP.setVisible(false);
+        exit.setVisible(false);
+
+    }
+
+    public void refresh() {
+        Map<String, String> clientData = conn.getClientData(identificator);
+
         homeTP.home.balance.setText(clientData.get("BANK_ACCOUNT_FUNDS"));
+
         homeTP.info.name.setText(clientData.get("FIRST_NAME"));
         homeTP.info.surname.setText(clientData.get("SECOND_NAME"));
         homeTP.info.birthdate.setText(clientData.get("BIRTH_DATE"));
@@ -78,8 +97,6 @@ public class App extends JFrame {
         homeTP.savings.savings.setValueAt(clientData.get("SAVING_BANK_ACCOUNT"), 1, 1);
         homeTP.savings.savings.setValueAt(clientData.get("BANK_ACCOUNT_FUNDS"), 0, 2);
         homeTP.savings.savings.setValueAt(clientData.get("SAVING_BANK_ACCOUNT_FUNDS"), 1, 2);
-        homeTP.setVisible(true);
-        exit.setVisible(true);
     }
 
     public void generateAccounts(int number) {

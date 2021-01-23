@@ -45,4 +45,9 @@ public class LoginPanel extends JPanel {
         userNameText.addActionListener(l);
         passwordText.addActionListener(l);
     }
+
+    public void clear(){
+        userNameText.setText("");
+        passwordText.setText("");
+    }
 }
