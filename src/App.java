@@ -50,7 +50,7 @@ public class App extends JFrame {
 
         homeTP.setVisible(false);
         exit = new JButton("Logout");
-        exit.addActionListener( a -> logoutAccount());
+        exit.addActionListener(a -> logoutAccount());
         exit.setVisible(false);
         add(exit, BorderLayout.SOUTH);
         add(homeTP, BorderLayout.CENTER);
@@ -74,7 +74,7 @@ public class App extends JFrame {
         loginSignupTP.setVisible(true);
         homeTP.setVisible(false);
         exit.setVisible(false);
-    }
+}
 
     public void refresh(){
         Map<String, String> clientData = conn.getClientData(identificator);
