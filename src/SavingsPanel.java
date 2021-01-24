@@ -6,12 +6,17 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.*;
 
-public class SavingsPanel extends JPanel implements ActionListener {
+public class SavingsPanel extends JPanel{
+    static final long serialVersionUID = 42L;
     JLabel amountLabel;
     JTextField amount;
     JButton transferTo;
     JButton transferFrom;
     JTable savings;
+    DefaultTableModel savingsTM;
+    transient Object[] headerRow;
+    static final String SELECT = "Select"; 
+    static final String NOINFO = "No information";
 
     SavingsPanel() {
         super(new BorderLayout());
@@ -20,28 +25,30 @@ public class SavingsPanel extends JPanel implements ActionListener {
         transferFrom = new JButton("Transfer from selected account");
         amountLabel = new JLabel("Amount");
         amount = new JTextField();
+        savingsTM = new DefaultTableModel();
+        headerRow = new Object[] { "Name", "Number", "Balance", "Percent", SELECT };
 
-        DefaultTableModel savingsTM = new DefaultTableModel();
-        savingsTM.setDataVector(
-                new Object[][] { { "Konto 1", 123123, 1000, 3, new JRadioButton() },
-                        { "Konto 2", 1123, 13000, 11, new JRadioButton() } },
-                new Object[] { "Name", "Number", "Balance", "Percent", "Select" });
         savings = new JTable(savingsTM) {
+            static final long serialVersionUID = 42L;
             @Override
             public void tableChanged(TableModelEvent tme) {
                 super.tableChanged(tme);
                 repaint();
             }
+            @Override
+            public boolean isCellEditable(int row, int col) {return col == 4;}
         };
+        savingsTM.setDataVector(
+                new Object[][] { { NOINFO, NOINFO, NOINFO, NOINFO, new JRadioButton() }},
+                headerRow);
         ButtonGroup bg = new ButtonGroup();
-        bg.add((JRadioButton) savingsTM.getValueAt(0, 4));
-        bg.add((JRadioButton) savingsTM.getValueAt(1, 4));
-        savings.getColumn("Select").setCellRenderer(new RadioButtonRenderer());
-        savings.getColumn("Select").setCellEditor(new RadioButtonEditor(new JCheckBox()));
+        for (int i = 0; i < savings.getRowCount(); i++){
+            bg.add((JRadioButton) savingsTM.getValueAt(i, 4));
+        }
+        savings.getColumn(SELECT).setCellRenderer(new RadioButtonRenderer());
+        savings.getColumn(SELECT).setCellEditor(new RadioButtonEditor(new JCheckBox()));
         JScrollPane sp = new JScrollPane(savings);
         add(sp, BorderLayout.CENTER);
-        transferTo.addActionListener(this);
-        transferFrom.addActionListener(this);
 
         JPanel p = new JPanel(new GridLayout(2, 2));
         p.add(amountLabel);
@@ -56,16 +63,13 @@ public class SavingsPanel extends JPanel implements ActionListener {
         transferTo.addActionListener(l);
     }
 
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case "Transfer to selected account":
-                break;
-            case "Transfer from selected account":
-                break;
-            default:
-                break;
+    public void refresh(Object[][] data){
+        savingsTM.setDataVector(data, headerRow);
+        for(int i = 0; i < savings.getRowCount(); i++){
+            savings.setValueAt(new JRadioButton(), i, 4);
         }
     }
+
 }
 
 class RadioButtonRenderer implements TableCellRenderer {
@@ -78,6 +82,7 @@ class RadioButtonRenderer implements TableCellRenderer {
 }
 
 class RadioButtonEditor extends DefaultCellEditor implements ItemListener {
+    static final long serialVersionUID = 42L;
     private JRadioButton button;
 
     public RadioButtonEditor(JCheckBox checkBox) {

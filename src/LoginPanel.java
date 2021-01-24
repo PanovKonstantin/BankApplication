@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class LoginPanel extends JPanel {
+    static final long serialVersionUID = 42L;
     JLabel userLabel;
     JLabel passwordLabel;
     JLabel message;

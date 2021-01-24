@@ -5,16 +5,21 @@ import java.util.Map;
 
 public class ConnectionDatabase {
 
-    private final String URL = "jdbc:oracle:thin:@ora4.ii.pw.edu.pl:1521/pdb1.ii.pw.edu.pl";
-    private final String login = "BD1_Z09";
-    private final String password = "7fncmp";
+    private static final String URL = "jdbc:oracle:thin:@ora4.ii.pw.edu.pl:1521/pdb1.ii.pw.edu.pl";
+    private static final String LOGIN = "BD1_Z09";
+    private static final String PASSWORD = "7fncmp";
     private Connection conn;
+    static final String SQLSTATE = "SQL State: %s\n%s";
+    static final String BANK_ACCOUNT = "BANK_ACCOUNT";
+    static final String USERNAME = "USERNAME";
+    static final String PW = "PASSWORD";
+    Random rand = new Random();
 
     public void openConnection() {
         try {
-            conn = DriverManager.getConnection(URL, login, password);
+            conn = DriverManager.getConnection(URL, LOGIN, PASSWORD);
         } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -24,24 +29,34 @@ public class ConnectionDatabase {
         try {
             conn.close();
         } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public int addClient(String firstName, String secondName, String username, String email, String birthdate,
-            String phone, String password, String pwRepeat, String country, String city, String street, String home,
-            String apartment, String postCode) {
-        if (!password.equals(pwRepeat))
+    public int addClient(String[] info) {
+        String firstName = info[0];
+        String secondName = info[1];
+        String username = info[2];
+        String email = info[3];
+        String birthdate = info[4];
+        String phone = info[5];
+        String pw = info[6];
+        String pwRepeat = info[7];
+        String country = info[8];
+        String city = info[9];
+        String street = info[10];
+        String home = info[11];
+        String apartment = info[12];
+        String postCode = info[13];
+        if (!pw.equals(pwRepeat))
             return -1;
         openConnection();
-        try {
-            Statement statement = conn.createStatement();
+        try (Statement statement = conn.createStatement()){
             String id = "";
             String bankAccount = "";
             String savingBankAccount = "";
-            Random rand = new Random();
             ResultSet rs = statement.executeQuery("SELECT SEQ_USERS.NEXTVAL FROM DUAL");
             while (rs.next()) {
                 id = rs.getString(1); // getting client id
@@ -49,11 +64,11 @@ public class ConnectionDatabase {
 
             rs = statement.executeQuery("SELECT BANK_ACCOUNT, IN_USE FROM ALL_ACCOUNTS WHERE IN_USE=0");
             while (rs.next()) {
-                bankAccount = rs.getString("BANK_ACCOUNT"); // getting bank account
+                bankAccount = rs.getString(BANK_ACCOUNT); // getting bank account
                 break;
             }
             while (rs.next()) {
-                savingBankAccount = rs.getString("BANK_ACCOUNT"); // getting saving bank account
+                savingBankAccount = rs.getString(BANK_ACCOUNT); // getting saving bank account
                 break;
             }
             statement.executeUpdate("UPDATE ALL_ACCOUNTS SET IN_USE = 1 WHERE BANK_ACCOUNT=" + bankAccount);
@@ -65,7 +80,7 @@ public class ConnectionDatabase {
                     + Integer.toString(rand.nextInt(5000)) + "')");
             statement.executeUpdate("INSERT INTO SAVING_BANK_ACCOUNTS VALUES('" + id + "','" + savingBankAccount + "','"
                     + Integer.toString(rand.nextInt(50000)) + "')");
-            statement.executeUpdate("INSERT INTO USERS VALUES('" + id + "','" + username + "','" + password + "')");
+            statement.executeUpdate("INSERT INTO USERS VALUES('" + id + "','" + username + "','" + pw + "')");
             statement.executeUpdate("INSERT INTO ADDRESSES VALUES('" + id + "','" + country + "','" + city + "','"
                     + street + "','" + home + "','" + apartment + "','" + postCode + "')");
             closeConnection();
@@ -73,7 +88,7 @@ public class ConnectionDatabase {
         } catch (
 
         SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -84,21 +99,21 @@ public class ConnectionDatabase {
 
     }
 
-    public int loginUser(String username, String password) {
+    public int loginUser(String username, String pw) {
         openConnection();
         try (Statement statement = conn.createStatement()) {
             ResultSet rs = statement.executeQuery("SELECT * FROM USERS");
             while (rs.next()) {
                 int id = rs.getInt("ID");
-                String table_username = rs.getString("USERNAME");
-                String table_password = rs.getString("PASSWORD");
-                if (username.equals(table_username) && password.equals(table_password)) {
+                String tableUsername = rs.getString(USERNAME);
+                String tablePassword = rs.getString(PW);
+                if (username.equals(tableUsername) && pw.equals(tablePassword)) {
                     closeConnection();
                     return id;
                 }
             }
         } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -108,15 +123,14 @@ public class ConnectionDatabase {
 
     public boolean addAccounts(String[] accounts) {
         openConnection();
-        try {
-            Statement statement = conn.createStatement();
+        try (Statement statement = conn.createStatement()){
             for (int i = 0; i < accounts.length; i++) {
                 statement.executeUpdate("INSERT INTO ALL_ACCOUNTS VALUES('" + accounts[i] + "','0')");
             }
             closeConnection();
             return true;
         } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -125,16 +139,29 @@ public class ConnectionDatabase {
     }
 
     public Map getClientData(int id) {
-        Map<String, String> clientData = new HashMap<String, String>();
+        Map<String, String> clientData = new HashMap<>();
         String clientID = Integer.toString(id);
         clientData.put("ID", clientID);
         openConnection();
-        try {
-            Statement statement = conn.createStatement();
-            String firstName = "", secondName = "", birthDate = "", phoneNumber = "", email = "", bankAccount = "",
-                    savingBankAccount = "", bankAccountFunds = "", savingBankAccountFunds = "", username = "",
-                    password = "", address = "", country = "", city = "", street = "", home = "", apartment = "",
-                    postCode = "";
+        try (Statement statement = conn.createStatement()){
+            String firstName = "";
+            String secondName = "";
+            String birthDate = "";
+            String phoneNumber = "";
+            String email = "";
+            String bankAccount = "";
+            String savingBankAccount = "";
+            String bankAccountFunds = "";
+            String savingBankAccountFunds = "";
+            String username = "";
+            String pw = "";
+            String address = "";
+            String country = "";
+            String city = "";
+            String street = "";
+            String home = "";
+            String apartment = "";
+            String postCode = "";
             ResultSet rs = statement.executeQuery("SELECT * FROM CLIENTS WHERE ID=" + clientID);
             while (rs.next()) {
                 firstName = rs.getString("FIRST_NAME");
@@ -151,15 +178,15 @@ public class ConnectionDatabase {
 
             rs = statement.executeQuery("SELECT * FROM BANK_ACCOUNTS WHERE ID=" + clientID);
             while (rs.next()) {
-                bankAccount = rs.getString("BANK_ACCOUNT");
+                bankAccount = rs.getString(BANK_ACCOUNT);
                 bankAccountFunds = rs.getString("AVAILABLE_FUNDS");
             }
-            clientData.put("BANK_ACCOUNT", bankAccount);
+            clientData.put(BANK_ACCOUNT, bankAccount);
             clientData.put("BANK_ACCOUNT_FUNDS", bankAccountFunds);
 
             rs = statement.executeQuery("SELECT * FROM SAVING_BANK_ACCOUNTS WHERE ID=" + clientID);
             while (rs.next()) {
-                savingBankAccount = rs.getString("BANK_ACCOUNT");
+                savingBankAccount = rs.getString(BANK_ACCOUNT);
                 savingBankAccountFunds = rs.getString("AVAILABLE_FUNDS");
             }
             clientData.put("SAVING_BANK_ACCOUNT", savingBankAccount);
@@ -167,11 +194,11 @@ public class ConnectionDatabase {
 
             rs = statement.executeQuery("SELECT * FROM USERS WHERE ID=" + clientID);
             while (rs.next()) {
-                username = rs.getString("USERNAME");
-                password = rs.getString("PASSWORD");
+                username = rs.getString(USERNAME);
+                pw = rs.getString(PW);
             }
-            clientData.put("USERNAME", username);
-            clientData.put("PASSWORD", password);
+            clientData.put(USERNAME, username);
+            clientData.put(PW, pw);
 
             rs = statement.executeQuery("SELECT * FROM ADDRESSES WHERE ID=" + clientID);
             while (rs.next()) {
@@ -186,7 +213,7 @@ public class ConnectionDatabase {
             clientData.put("ADDRESS", address);
 
         } catch (SQLException e) {
-            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -194,4 +221,30 @@ public class ConnectionDatabase {
         return clientData;
     }
 
+    public Object[][] getSavingsAccount(int id){
+        return new Object[][] { { "Konto 1", 123123, 1000, 3, "" },
+                            { "Konto 2", 1123, 13000, 11, ""  },
+                            { "Konto 3", 11, 22, 33, ""  } ,
+                            { "Konto 3", 11, 22, 33, ""  } };
+    }
+
+    public Object[][] getTransactionHistory(int id){
+        openConnection();
+        try (Statement statement = conn.createStatement()){
+            ResultSet rs = statement.executeQuery("SELECT bank_account FROM bank_accounts WHERE id = " + id);
+            while(rs.next()){String bankAccount = rs.getString(BANK_ACCOUNT);}
+            rs = statement.executeQuery("SELECT * FROM TRANSACTION_HISTORY");
+            while(rs.next()){
+                System.out.println(rs.getString("TRANSACTION_DATE"));
+            }
+
+
+        } catch (SQLException e) {
+            System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        closeConnection();
+        return new Object[][] { { "vxvc", "xqerz", "wfda", 2222, "0000-00-00" } };
+    }
 }

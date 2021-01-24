@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class SignupPanel extends JPanel {
+    static final long serialVersionUID = 42L;
     JTextField firstNameText;
     JTextField secondNameText;
     JTextField userNameText;
@@ -164,7 +165,12 @@ public class SignupPanel extends JPanel {
         secondNameText.setText("");
         userNameText.setText("");
         emailText.setText("");
-        addressText.setText("");
+        countryText.setText("");
+        cityText.setText("");
+        streetText.setText("");
+        homeText.setText("");
+        apartmentText.setText("");
+        postCodeText.setText("");
         birthdateText.setText("");
         phoneText.setText("");
         passwordText.setText("");
