@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.event.*;
 
 public class LoginSignupTabbedPane extends JTabbedPane {
+    static final long serialVersionUID = 42L;
     LoginPanel loginPanel;
     SignupPanel signupPanel;
 

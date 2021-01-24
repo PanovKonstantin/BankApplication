@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class SignupPanel extends JPanel {
+    static final long serialVersionUID = 42L;
     JTextField firstNameText;
     JTextField secondNameText;
     JTextField userNameText;
