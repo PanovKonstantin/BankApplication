@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class InfoPanel extends JPanel implements ActionListener {
+    static final long serialVersionUID = 42L;
     JTextField accountid;
     JTextField username;
     JTextField email;

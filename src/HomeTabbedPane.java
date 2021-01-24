@@ -1,6 +1,7 @@
 import javax.swing.*;
 
 public class HomeTabbedPane extends JTabbedPane {
+    static final long serialVersionUID = 42L;
     HomePanel home;
     InfoPanel info;
     SavingsPanel savings;
@@ -14,6 +15,7 @@ public class HomeTabbedPane extends JTabbedPane {
 
         info = new InfoPanel();
         add("Information", info);
+
 
         savings = new SavingsPanel();
         savings.addActionListener(e -> {
