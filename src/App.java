@@ -46,9 +46,25 @@ public class App extends JFrame {
                     break;
             }
         });
+
         add(loginSignupTP);
 
         homeTP = new HomeTabbedPane();
+
+        homeTP.home.addActionListener(a -> {
+            String target = homeTP.home.message.getText();
+            String amount = homeTP.home.amount.getText();
+            String id = Integer.toString(identificator);
+            int result = conn.makeTransfer(id, amount, target);
+            switch (result) {
+                case -1:
+                    homeTP.home.inform("Not enough funds!");
+                    break;
+                default:
+                    homeTP.home.inform("Transfer succeeded!");
+                    break;
+            }
+        });
 
         homeTP.setVisible(false);
         exit = new JButton("Logout");
@@ -76,10 +92,9 @@ public class App extends JFrame {
         loginSignupTP.setVisible(true);
         homeTP.setVisible(false);
         exit.setVisible(false);
-}
+    }
 
-
-    public void refresh(){
+    public void refresh() {
         Map<String, String> clientData = conn.getClientData(identificator);
 
         homeTP.home.balance.setText(clientData.get("BANK_ACCOUNT_FUNDS"));

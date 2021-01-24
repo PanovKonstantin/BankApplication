@@ -2,6 +2,7 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 
 import java.awt.*;
+import java.awt.event.*;
 
 public class HomePanel extends JPanel{
     JLabel balanceLabel;
@@ -31,7 +32,7 @@ public class HomePanel extends JPanel{
         balancePanel.add(balance);
 
         JPanel transactionPanel = new JPanel(new GridLayout(4, 2));
-        transactionPanel.add(new JLabel("Transactoin"));
+        transactionPanel.add(new JLabel("Transaction"));
         transactionPanel.add(new JLabel(""));
         transactionPanel.add(new JLabel("Target account: "));
         transactionPanel.add(target);
@@ -47,6 +48,22 @@ public class HomePanel extends JPanel{
         add(p, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
 
+    }
+
+    public void addActionListener(ActionListener l) {
+        target.addActionListener(l);
+        amount.addActionListener(l);
+        transfer.addActionListener(l);
+    }
+
+    public void clear(){
+        message.setText("");
+        target.setText("");
+        amount.setText("");
+    }
+
+    public void inform(String info) {
+        message.setText(info);
     }
 }
 

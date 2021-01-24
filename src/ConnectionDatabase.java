@@ -194,4 +194,31 @@ public class ConnectionDatabase {
         return clientData;
     }
 
+    public int makeTransfer(String clientID, String amount, String target) {
+        openConnection();
+        try {
+            String bankAccount = "", funds = "";
+            Statement statement = conn.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT * FROM BANK_ACCOUNTS WHERE ID=" + clientID);
+            while (rs.next()) {
+                bankAccount = rs.getString("BANK_ACCOUNT");
+                funds = rs.getString("AVAILABLE_FUNDS");
+            }
+            if (Integer.parseInt(amount) > Integer.parseInt(funds))
+            {
+                closeConnection();
+                return -1;
+            }
+                
+
+            
+        } catch (SQLException e) {
+            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        closeConnection();
+        return 1;
+    }
+
 }
