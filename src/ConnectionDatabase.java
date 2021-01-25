@@ -242,15 +242,12 @@ public class ConnectionDatabase {
 
     public int makeTransaction(String id, String amount, String target) {
         openConnection();
-        try (CallableStatement  callstatement = conn.prepareCall("begin make_transaction(?, ?, ?, ?); end;")) {
-            callstatement.registerOutParameter(4, OracleTypes.CURSOR);
+        try (CallableStatement  callstatement = conn.prepareCall("{call make_transaction(?, ?, ?, ?)}")) {
             callstatement.setString(1, id);
             callstatement.setString(2, amount);
             callstatement.setString(3, target);
-            ResultSet rs = (ResultSet)callstatement.getObject(4);
-            while(rs.next()){
-                rs.getString(1);
-            }
+            callstatement.registerOutParameter(4, Types.NUMERIC);
+            return callstatement.executeUpdate();
         } catch (SQLException e) {
             System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
         } catch (Exception e) {

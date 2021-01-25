@@ -2,6 +2,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
 import java.awt.*;
+import java.awt.event.*;
 
 public class HomePanel extends JPanel{
     static final long serialVersionUID = 42L;
@@ -64,5 +65,21 @@ public class HomePanel extends JPanel{
 
     public void refresh(Object[][] data){
         historyTM.setDataVector(data, headerRow);
+    }
+
+    public void addActionListener(ActionListener l) {
+        target.addActionListener(l);
+        amount.addActionListener(l);
+        transfer.addActionListener(l);
+    }
+
+    public void clear(){
+        message.setText("");
+        target.setText("");
+        amount.setText("");
+    }
+
+    public void inform(String info) {
+        message.setText(info);
     }
 }
