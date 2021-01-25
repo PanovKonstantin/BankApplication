@@ -61,4 +61,8 @@ public class HomePanel extends JPanel{
         add(scrollPane, BorderLayout.CENTER);
 
     }
+
+    public void refresh(Object[][] data){
+        historyTM.setDataVector(data, headerRow);
+    }
 }
