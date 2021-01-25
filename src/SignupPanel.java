@@ -160,7 +160,7 @@ public class SignupPanel extends JPanel {
         submit.addActionListener(l);
     }
 
-    public void clear(){
+    public void clear() {
         firstNameText.setText("");
         secondNameText.setText("");
         userNameText.setText("");
