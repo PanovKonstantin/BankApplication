@@ -5,7 +5,6 @@ import java.util.Map;
 
 public class ConnectionDatabase {
 
-  
     private static final String URL = "jdbc:oracle:thin:@ora4.ii.pw.edu.pl:1521/pdb1.ii.pw.edu.pl";
     private static final String LOGIN = "BD1_Z09";
     private static final String PASSWORD = "7fncmp";
@@ -18,10 +17,10 @@ public class ConnectionDatabase {
 
     public void openConnection() {
         try {
-          
+
             conn = DriverManager.getConnection(URL, LOGIN, PASSWORD);
         } catch (SQLException e) {
-          
+
             System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
@@ -32,14 +31,13 @@ public class ConnectionDatabase {
         try {
             conn.close();
         } catch (SQLException e) {
-        
+
             System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
- 
     public int addClient(String[] info) {
         String firstName = info[0];
         String secondName = info[1];
@@ -58,8 +56,8 @@ public class ConnectionDatabase {
         if (!pw.equals(pwRepeat))
             return -1;
         openConnection();
-       
-        try (Statement statement = conn.createStatement()){
+
+        try (Statement statement = conn.createStatement()) {
             String id = "";
             String bankAccount = "";
             String savingBankAccount = "";
@@ -70,12 +68,12 @@ public class ConnectionDatabase {
 
             rs = statement.executeQuery("SELECT BANK_ACCOUNT, IN_USE FROM ALL_ACCOUNTS WHERE IN_USE=0");
             while (rs.next()) {
-             
+
                 bankAccount = rs.getString(BANK_ACCOUNT); // getting bank account
                 break;
             }
             while (rs.next()) {
-           
+
                 savingBankAccount = rs.getString(BANK_ACCOUNT); // getting saving bank account
                 break;
             }
@@ -88,7 +86,7 @@ public class ConnectionDatabase {
                     + Integer.toString(rand.nextInt(5000)) + "')");
             statement.executeUpdate("INSERT INTO SAVING_BANK_ACCOUNTS VALUES('" + id + "','" + savingBankAccount + "','"
                     + Integer.toString(rand.nextInt(50000)) + "')");
-          
+
             statement.executeUpdate("INSERT INTO USERS VALUES('" + id + "','" + username + "','" + pw + "')");
             statement.executeUpdate("INSERT INTO ADDRESSES VALUES('" + id + "','" + country + "','" + city + "','"
                     + street + "','" + home + "','" + apartment + "','" + postCode + "')");
@@ -97,7 +95,7 @@ public class ConnectionDatabase {
         } catch (
 
         SQLException e) {
-          
+
             System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
@@ -109,14 +107,13 @@ public class ConnectionDatabase {
 
     }
 
-
     public int loginUser(String username, String pw) {
         openConnection();
         try (Statement statement = conn.createStatement()) {
             ResultSet rs = statement.executeQuery("SELECT * FROM USERS");
             while (rs.next()) {
                 int id = rs.getInt("ID");
-              
+
                 String tableUsername = rs.getString(USERNAME);
                 String tablePassword = rs.getString(PW);
                 if (username.equals(tableUsername) && pw.equals(tablePassword)) {
@@ -136,15 +133,15 @@ public class ConnectionDatabase {
 
     public boolean addAccounts(String[] accounts) {
         openConnection();
-       
-        try (Statement statement = conn.createStatement()){
+
+        try (Statement statement = conn.createStatement()) {
             for (int i = 0; i < accounts.length; i++) {
                 statement.executeUpdate("INSERT INTO ALL_ACCOUNTS VALUES('" + accounts[i] + "','0')");
             }
             closeConnection();
             return true;
         } catch (SQLException e) {
-           
+
             System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
@@ -154,13 +151,13 @@ public class ConnectionDatabase {
     }
 
     public Map getClientData(int id) {
-      
+
         Map<String, String> clientData = new HashMap<>();
         String clientID = Integer.toString(id);
         clientData.put("ID", clientID);
         openConnection();
-       
-        try (Statement statement = conn.createStatement()){
+
+        try (Statement statement = conn.createStatement()) {
             String firstName = "";
             String secondName = "";
             String birthDate = "";
@@ -235,7 +232,7 @@ public class ConnectionDatabase {
             clientData.put("ADDRESS", address);
 
         } catch (SQLException e) {
-          
+
             System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
@@ -243,23 +240,23 @@ public class ConnectionDatabase {
         closeConnection();
         return clientData;
     }
-    public Object[][] getSavingsAccount(int id){
-        return new Object[][] { { "Konto 1", 123123, 1000, 3, "" },
-                            { "Konto 2", 1123, 13000, 11, ""  },
-                            { "Konto 3", 11, 22, 33, ""  } ,
-                            { "Konto 3", 11, 22, 33, ""  } };
+
+    public Object[][] getSavingsAccount(int id) {
+        return new Object[][] { { "Konto 1", 123123, 1000, 3, "" }, { "Konto 2", 1123, 13000, 11, "" },
+                { "Konto 3", 11, 22, 33, "" }, { "Konto 3", 11, 22, 33, "" } };
     }
 
-    public Object[][] getTransactionHistory(int id){
+    public Object[][] getTransactionHistory(int id) {
         openConnection();
-        try (Statement statement = conn.createStatement()){
+        try (Statement statement = conn.createStatement()) {
             ResultSet rs = statement.executeQuery("SELECT bank_account FROM bank_accounts WHERE id = " + id);
-            while(rs.next()){String bankAccount = rs.getString(BANK_ACCOUNT);}
+            while (rs.next()) {
+                String bankAccount = rs.getString(BANK_ACCOUNT);
+            }
             rs = statement.executeQuery("SELECT * FROM TRANSACTION_HISTORY");
-            while(rs.next()){
+            while (rs.next()) {
                 System.out.println(rs.getString("TRANSACTION_DATE"));
             }
-
 
         } catch (SQLException e) {
             System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
@@ -268,5 +265,39 @@ public class ConnectionDatabase {
         }
         closeConnection();
         return new Object[][] { { "vxvc", "xqerz", "wfda", 2222, "0000-00-00" } };
+    }
+
+    public int makeTransfer(String id, String amount, String target) {
+        String bankAccount = "";
+        String funds = "";
+        String targetFunds = "";
+        openConnection();
+        try (Statement statement = conn.createStatement()) {
+            ResultSet rs = statement.executeQuery("SELECT * FROM BANK_ACCOUNTS WHERE ID = " + id);
+            while (rs.next()) {
+                bankAccount = rs.getString(BANK_ACCOUNT);
+                funds = rs.getString("AVAILABLE_FUNDS");
+            }
+            rs = statement.executeQuery("SELECT * FROM BANK_ACCOUNTS WHERE BANK_ACCOUNT = " + target);
+            while (rs.next()) {
+                targetFunds = rs.getString("AVAILABLE_FUNDS");
+            }
+            if (Integer.parseInt(amount) > Integer.parseInt(funds)) {
+                closeConnection();
+                return -1;
+            }
+            statement.executeUpdate("UPDATE BANK_ACCOUNTS SET AVAILABLE_FUNDS = " + Integer.toString(Integer.parseInt(targetFunds) + Integer.parseInt(amount)) +  " WHERE BANK_ACCOUNT=" + target);
+            statement.executeUpdate("UPDATE BANK_ACCOUNTS SET AVAILABLE_FUNDS = " + Integer.toString(Integer.parseInt(funds) - Integer.parseInt(amount)) +  " WHERE BANK_ACCOUNT=" + bankAccount);
+            statement.executeUpdate("INSERT INTO TRANSACTIONS VALUES(seq_transactions.NEXTVAL,'" + bankAccount + "','" + target + "','"
+                    + amount + "',SYSDATE)");
+            closeConnection();
+            return 1;
+        } catch (SQLException e) {
+            System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        closeConnection();
+        return -2;
     }
 }
