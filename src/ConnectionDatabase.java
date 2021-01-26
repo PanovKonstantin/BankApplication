@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +52,7 @@ public class ConnectionDatabase {
         String city = info[9];
         String street = info[10];
         String home = info[11];
-        String apartment = info[12];
+        String appartment = info[12];
         String postCode = info[13];
         if (!pw.equals(pwRepeat))
             return -1;
@@ -89,7 +90,7 @@ public class ConnectionDatabase {
 
             statement.executeUpdate("INSERT INTO USERS VALUES('" + id + "','" + username + "','" + pw + "')");
             statement.executeUpdate("INSERT INTO ADDRESSES VALUES('" + id + "','" + country + "','" + city + "','"
-                    + street + "','" + home + "','" + apartment + "','" + postCode + "')");
+                    + street + "','" + home + "','" + appartment + "','" + postCode + "')");
             closeConnection();
             return Integer.parseInt(id);
         } catch (
@@ -112,7 +113,7 @@ public class ConnectionDatabase {
         try (Statement statement = conn.createStatement()) {
             ResultSet rs = statement.executeQuery("SELECT * FROM USERS");
             while (rs.next()) {
-                int id = rs.getInt("ID");
+                int id = rs.getInt("CLIENT_ID");
 
                 String tableUsername = rs.getString(USERNAME);
                 String tablePassword = rs.getString(PW);
@@ -122,7 +123,6 @@ public class ConnectionDatabase {
                 }
             }
         } catch (SQLException e) {
-
             System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
@@ -130,33 +130,11 @@ public class ConnectionDatabase {
         closeConnection();
         return -1;
     }
-
-    public boolean addAccounts(String[] accounts) {
-        openConnection();
-
-        try (Statement statement = conn.createStatement()) {
-            for (int i = 0; i < accounts.length; i++) {
-                statement.executeUpdate("INSERT INTO ALL_ACCOUNTS VALUES('" + accounts[i] + "','0')");
-            }
-            closeConnection();
-            return true;
-        } catch (SQLException e) {
-
-            System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        closeConnection();
-        return false;
-    }
-
     public Map getClientData(int id) {
-
         Map<String, String> clientData = new HashMap<>();
         String clientID = Integer.toString(id);
         clientData.put("ID", clientID);
         openConnection();
-
         try (Statement statement = conn.createStatement()) {
             String firstName = "";
             String secondName = "";
@@ -170,19 +148,22 @@ public class ConnectionDatabase {
             String username = "";
             String pw = "";
             String address = "";
+            String countryID = "";
             String country = "";
             String city = "";
             String street = "";
             String home = "";
-            String apartment = "";
+            String addressID = "";
+            String appartment = "";
             String postCode = "";
-            ResultSet rs = statement.executeQuery("SELECT * FROM CLIENTS WHERE ID=" + clientID);
+            ResultSet rs = statement.executeQuery("SELECT * FROM CLIENTS WHERE CLIENT_ID=" + clientID);
             while (rs.next()) {
                 firstName = rs.getString("FIRST_NAME");
                 secondName = rs.getString("SECOND_NAME");
                 birthDate = rs.getDate("BIRTH_DATE").toString();
                 phoneNumber = rs.getString("PHONE_NUMBER");
                 email = rs.getString("EMAIL");
+                addressID = rs.getString("ADDRESS_ID");
             }
             clientData.put("FIRST_NAME", firstName);
             clientData.put("SECOND_NAME", secondName);
@@ -190,7 +171,7 @@ public class ConnectionDatabase {
             clientData.put("PHONE_NUMBER", phoneNumber);
             clientData.put("EMAIL", email);
 
-            rs = statement.executeQuery("SELECT * FROM BANK_ACCOUNTS WHERE ID=" + clientID);
+            rs = statement.executeQuery("SELECT * FROM BANK_ACCOUNTS WHERE CLIENT_ID=" + clientID);
             while (rs.next()) {
 
                 bankAccount = rs.getString(BANK_ACCOUNT);
@@ -200,7 +181,7 @@ public class ConnectionDatabase {
             clientData.put(BANK_ACCOUNT, bankAccount);
             clientData.put("BANK_ACCOUNT_FUNDS", bankAccountFunds);
 
-            rs = statement.executeQuery("SELECT * FROM SAVING_BANK_ACCOUNTS WHERE ID=" + clientID);
+            rs = statement.executeQuery("SELECT * FROM SAVING_BANK_ACCOUNTS WHERE CLIENT_ID=" + clientID);
             while (rs.next()) {
 
                 savingBankAccount = rs.getString(BANK_ACCOUNT);
@@ -209,7 +190,7 @@ public class ConnectionDatabase {
             clientData.put("SAVING_BANK_ACCOUNT", savingBankAccount);
             clientData.put("SAVING_BANK_ACCOUNT_FUNDS", savingBankAccountFunds);
 
-            rs = statement.executeQuery("SELECT * FROM USERS WHERE ID=" + clientID);
+            rs = statement.executeQuery("SELECT * FROM USERS WHERE CLIENT_ID=" + clientID);
             while (rs.next()) {
 
                 username = rs.getString(USERNAME);
@@ -219,16 +200,23 @@ public class ConnectionDatabase {
             clientData.put(USERNAME, username);
             clientData.put(PW, pw);
 
-            rs = statement.executeQuery("SELECT * FROM ADDRESSES WHERE ID=" + clientID);
+            rs = statement.executeQuery("SELECT * FROM ADDRESSES WHERE ADDRESS_ID=" + addressID);
             while (rs.next()) {
-                country = rs.getString("COUNTRY");
+
+                countryID = rs.getString("COUNTRY_ID");
                 city = rs.getString("CITY");
                 street = rs.getString("STREET");
                 home = rs.getString("HOME");
-                apartment = rs.getString("APARTMENT");
+
+                appartment = rs.getString("APPARTMENT");
                 postCode = rs.getString("POST_CODE");
             }
-            address = country + ", " + city + ", " + street + " " + home + ", " + apartment + ", " + postCode;
+
+            rs = statement.executeQuery("SELECT * FROM COUNTRIES WHERE COUNTRY_ID=" + countryID);
+            while (rs.next()){
+                country = rs.getString("COUNTRY_NAME");
+            }
+            address = country + ", " + city + ", " + street + " " + home + ", " + appartment + ", " + postCode;
             clientData.put("ADDRESS", address);
 
         } catch (SQLException e) {
@@ -240,7 +228,6 @@ public class ConnectionDatabase {
         closeConnection();
         return clientData;
     }
-
     public Object[][] getSavingsAccount(int id) {
         return new Object[][] { { "Konto 1", 123123, 1000, 3, "" }, { "Konto 2", 1123, 13000, 11, "" },
                 { "Konto 3", 11, 22, 33, "" }, { "Konto 3", 11, 22, 33, "" } };
@@ -249,14 +236,27 @@ public class ConnectionDatabase {
     public Object[][] getTransactionHistory(int id) {
         openConnection();
         try (Statement statement = conn.createStatement()) {
-            ResultSet rs = statement.executeQuery("SELECT bank_account FROM bank_accounts WHERE id = " + id);
+            String bankAccount = new String("");
+            ResultSet rs = statement.executeQuery("SELECT bank_account FROM bank_accounts WHERE CLIENT_ID = " + id);
+            ArrayList<Object[]> data = new ArrayList<>();
+            ArrayList<String> set = new ArrayList<>();
+            while(rs.next()){bankAccount = rs.getString(BANK_ACCOUNT);}
+            rs = statement.executeQuery("SELECT * FROM TRANSACTIONS WHERE SOURCE = " + bankAccount + "  OR TARGET = " + bankAccount + "ORDER BY TRANSACTION_DATE DESC");
+
             while (rs.next()) {
-                String bankAccount = rs.getString(BANK_ACCOUNT);
+
+                set.clear();
+                set.add(rs.getString("source"));
+                set.add(rs.getString("target"));
+                set.add(rs.getString("amount"));
+                set.add(rs.getString("transaction_date"));
+                data.add(set.toArray());
             }
-            rs = statement.executeQuery("SELECT * FROM TRANSACTION_HISTORY");
-            while (rs.next()) {
-                System.out.println(rs.getString("TRANSACTION_DATE"));
+            Object[][] ret = new Object[data.size()][];
+            for (int i = 0; i < data.size(); i++){
+                ret[i] = data.get(i);
             }
+            return ret;
 
         } catch (SQLException e) {
             System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
@@ -264,34 +264,17 @@ public class ConnectionDatabase {
             e.printStackTrace();
         }
         closeConnection();
-        return new Object[][] { { "vxvc", "xqerz", "wfda", 2222, "0000-00-00" } };
+        return new Object[][] { { } };
     }
 
-    public int makeTransfer(String id, String amount, String target) {
-        String bankAccount = "";
-        String funds = "";
-        String targetFunds = "";
+    public int makeTransaction(String id, String amount, String target) {
         openConnection();
-        try (Statement statement = conn.createStatement()) {
-            ResultSet rs = statement.executeQuery("SELECT * FROM BANK_ACCOUNTS WHERE ID = " + id);
-            while (rs.next()) {
-                bankAccount = rs.getString(BANK_ACCOUNT);
-                funds = rs.getString("AVAILABLE_FUNDS");
-            }
-            rs = statement.executeQuery("SELECT * FROM BANK_ACCOUNTS WHERE BANK_ACCOUNT = " + target);
-            while (rs.next()) {
-                targetFunds = rs.getString("AVAILABLE_FUNDS");
-            }
-            if (Integer.parseInt(amount) > Integer.parseInt(funds)) {
-                closeConnection();
-                return -1;
-            }
-            statement.executeUpdate("UPDATE BANK_ACCOUNTS SET AVAILABLE_FUNDS = " + Integer.toString(Integer.parseInt(targetFunds) + Integer.parseInt(amount)) +  " WHERE BANK_ACCOUNT=" + target);
-            statement.executeUpdate("UPDATE BANK_ACCOUNTS SET AVAILABLE_FUNDS = " + Integer.toString(Integer.parseInt(funds) - Integer.parseInt(amount)) +  " WHERE BANK_ACCOUNT=" + bankAccount);
-            statement.executeUpdate("INSERT INTO TRANSACTIONS VALUES(seq_transactions.NEXTVAL,'" + bankAccount + "','" + target + "','"
-                    + amount + "',SYSDATE)");
-            closeConnection();
-            return 1;
+        try (CallableStatement  callstatement = conn.prepareCall("{call make_transaction(?, ?, ?, ?)}")) {
+            callstatement.setString(1, id);
+            callstatement.setString(2, amount);
+            callstatement.setString(3, target);
+            callstatement.registerOutParameter(4, Types.NUMERIC);
+            return callstatement.executeUpdate();
         } catch (SQLException e) {
             System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
         } catch (Exception e) {
@@ -300,4 +283,5 @@ public class ConnectionDatabase {
         closeConnection();
         return -2;
     }
+
 }

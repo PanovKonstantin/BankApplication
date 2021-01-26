@@ -27,7 +27,7 @@ public class HomePanel extends JPanel{
 
         
         historyTM = new DefaultTableModel();
-        headerRow = new Object[] {"Type", "From", "To", "Amount", "Date" };
+        headerRow = new Object[] {"From", "To", "Amount", "Date" };
         history = new JTable(historyTM) {
             static final long serialVersionUID = 42L;
             @Override
@@ -61,6 +61,10 @@ public class HomePanel extends JPanel{
         add(p, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
 
+    }
+    public void refresh(Object[][] data){
+        if (data[0].length > 0) historyTM.setDataVector(data, headerRow);
+        else historyTM.setDataVector(new Object[][] {{NOINFO, NOINFO, NOINFO, NOINFO, NOINFO}}, headerRow);
     }
 
     public void addActionListener(ActionListener l) {
