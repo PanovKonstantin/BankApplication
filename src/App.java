@@ -6,7 +6,6 @@ import java.awt.*;
 public class App extends JFrame {
     static final long serialVersionUID = 42L;
     transient ConnectionDatabase conn;
-    transient AccountGenerator generator;
     JButton exit;
     LoginSignupTabbedPane loginSignupTP;
     HomeTabbedPane homeTP;
@@ -15,7 +14,6 @@ public class App extends JFrame {
     App() {
         super("Bank Application");
         conn = new ConnectionDatabase();
-        generator = new AccountGenerator();
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
@@ -47,6 +45,26 @@ public class App extends JFrame {
         add(loginSignupTP);
 
         homeTP = new HomeTabbedPane();
+        homeTP.home.addActionListener(a -> {
+            String target = homeTP.home.target.getText();
+            String amount = homeTP.home.amount.getText();
+            String id = Integer.toString(identificator);
+
+            int result = conn.makeTransaction(id, amount, target);
+            switch (result) {
+                case -2:
+                    homeTP.home.inform("Not enough funds!");
+                    break;
+                case -1:
+                    homeTP.home.inform("Transaction failed!");
+                    break;
+                default:
+                    homeTP.home.inform("Transfer succeeded!");
+                    refresh();
+                    homeTP.home.clear();
+                    break;
+            }
+        });
 
         homeTP.setVisible(false);
         exit = new JButton("Logout");
@@ -67,6 +85,7 @@ public class App extends JFrame {
         homeTP.setVisible(true);
         exit.setVisible(true);
         loginSignupTP.clear();
+        homeTP.home.clear();
     }
 
     public void logoutAccount() {
@@ -91,15 +110,7 @@ public class App extends JFrame {
         homeTP.info.address.setText(clientData.get("ADDRESS"));
         
 
-        homeTP.savings.refresh(conn.getTransactionHistory(identificator));
-    }
-
-    public void generateAccounts(int number) {
-        String[] accounts = new String[number];
-        for (int i = 0; i < number; i++) {
-            accounts[i] = generator.generateAccount();
-        }
-        conn.addAccounts(accounts);
+        homeTP.home.refresh(conn.getTransactionHistory(identificator));
     }
 
     public static void main(String[] args) {

@@ -14,6 +14,7 @@ public class SavingsPanel extends JPanel{
     JButton transferFrom;
     JTable savings;
     DefaultTableModel savingsTM;
+    ButtonGroup bg;
     transient Object[] headerRow;
     static final String SELECT = "Select"; 
     static final String NOINFO = "No information";
@@ -26,7 +27,7 @@ public class SavingsPanel extends JPanel{
         amountLabel = new JLabel("Amount");
         amount = new JTextField();
         savingsTM = new DefaultTableModel();
-        headerRow = new Object[] { "Name", "Number", "Balance", "Percent", SELECT };
+        headerRow = new Object[] { "Name", "Number", "Balance", "Percent", SELECT};
 
         savings = new JTable(savingsTM) {
             static final long serialVersionUID = 42L;
@@ -41,7 +42,7 @@ public class SavingsPanel extends JPanel{
         savingsTM.setDataVector(
                 new Object[][] { { NOINFO, NOINFO, NOINFO, NOINFO, new JRadioButton() }},
                 headerRow);
-        ButtonGroup bg = new ButtonGroup();
+        bg = new ButtonGroup();
         for (int i = 0; i < savings.getRowCount(); i++){
             bg.add((JRadioButton) savingsTM.getValueAt(i, 4));
         }
@@ -67,6 +68,7 @@ public class SavingsPanel extends JPanel{
         savingsTM.setDataVector(data, headerRow);
         for(int i = 0; i < savings.getRowCount(); i++){
             savings.setValueAt(new JRadioButton(), i, 4);
+            bg.add((JRadioButton) savingsTM.getValueAt(i, 4));
         }
     }
 
