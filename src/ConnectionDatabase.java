@@ -58,32 +58,62 @@ public class ConnectionDatabase {
             String id = "";
             String bankAccount = "";
             String savingBankAccount = "";
-            ResultSet rs = statement.executeQuery("SELECT SEQ_USERS.NEXTVAL FROM DUAL");
+            String addressID = "";
+            String countryID = "";
+            int rnd;
+
+            ResultSet rs = statement.executeQuery("SELECT country_id FROM countries WHERE country_name = UPPER('"+ country + "')");
             while (rs.next()) {
-                id = rs.getString(1); // getting client id
+                countryID = rs.getString(1);
+            }
+            if(countryID.length() == 0) return -2;
+            System.out.println("Valid country");
+
+            CallableStatement  callstatement = conn.prepareCall("{? = call test_date(?)}");
+            callstatement.registerOutParameter(1, Types.VARCHAR);
+            callstatement.setString(2, birthdate);
+            callstatement.execute();
+            System.out.println(callstatement.getString(1));
+            if(callstatement.getString(1).equals("Invalid")){
+                System.out.println("Invalid birthdate");
+                return -3;
+            }
+            System.out.println("Valid birthdate");
+
+            if(!phone.matches("\\d+")&&phone.length()!=9) return -4;
+            System.out.println("Valid phone number");
+
+            rs = statement.executeQuery("SELECT SEQ_CLIENTS.NEXTVAL FROM DUAL");
+            
+            while (rs.next()) {
+                id = rs.getString(1);
             }
 
-            rs = statement.executeQuery("SELECT BANK_ACCOUNT, IN_USE FROM ALL_ACCOUNTS WHERE IN_USE=0");
+            rs = statement.executeQuery("SELECT BANK_ACCOUNT FROM ALL_ACCOUNTS");
+            ArrayList<String> allAccounts = new ArrayList<>();
             while (rs.next()) {
-                bankAccount = rs.getString(BANK_ACCOUNT); // getting bank account
-                break;
+                allAccounts.add(rs.getString(BANK_ACCOUNT)); // getting bank account
             }
-            while (rs.next()) {
-                savingBankAccount = rs.getString(BANK_ACCOUNT); // getting saving bank account
-                break;
+            rnd = 100000 + rand.nextInt(900000);
+            while(!allAccounts.contains(bankAccount) && rnd/100000 != 5){
+                rnd = 100000 + rand.nextInt(900000);
+                bankAccount = String.valueOf(rnd);
             }
-            statement.executeUpdate("UPDATE ALL_ACCOUNTS SET IN_USE = 1 WHERE BANK_ACCOUNT=" + bankAccount);
-            statement.executeUpdate("UPDATE ALL_ACCOUNTS SET IN_USE = 1 WHERE BANK_ACCOUNT=" + savingBankAccount);
+            rs = statement.executeQuery("SELECT SEQ_ADDRESSES.NEXTVAL FROM DUAL");
+            while(rs.next()) addressID = rs.getString(1);
 
-            statement.executeUpdate("INSERT INTO CLIENTS VALUES('" + id + "','" + firstName + "','" + secondName + "','"
-                    + birthdate + "','" + phone + "','" + email + "')");
-            statement.executeUpdate("INSERT INTO BANK_ACCOUNTS VALUES('" + id + "','" + bankAccount + "','"
-                    + Integer.toString(rand.nextInt(5000)) + "')");
-            statement.executeUpdate("INSERT INTO SAVING_BANK_ACCOUNTS VALUES('" + id + "','" + savingBankAccount + "','"
-                    + Integer.toString(rand.nextInt(50000)) + "')");
-            statement.executeUpdate("INSERT INTO USERS VALUES('" + id + "','" + username + "','" + pw + "')");
-            statement.executeUpdate("INSERT INTO ADDRESSES VALUES('" + id + "','" + country + "','" + city + "','"
-                    + street + "','" + home + "','" + appartment + "','" + postCode + "')");
+            statement.executeUpdate("INSERT INTO ADDRESSES VALUES("+ addressID + " , " + countryID + " , '" + city + "','"+ street + "', "+ home + " , '"+appartment+"', '"+postCode+"')");
+            System.out.println("Address inserted");
+            statement.executeUpdate("ALTER SESSION SET NLS_DATE_FORMAT = \"DD/MM/YYYY\"");
+            statement.executeUpdate("INSERT INTO CLIENTS VALUES(" + id + ",'" + firstName + "','" + secondName + "','"
+                    + birthdate + "'," + phone + ",'" + email + "', " + addressID + ", 1)");
+            System.out.println("Client inserted");
+            statement.executeUpdate("INSERT INTO ALL_ACCOUNTS VALUES("+ bankAccount +", "+ 1 + ", SYSDATE, NULL, " + id + " )");
+            System.out.println("Account 1 inserted");
+            statement.executeUpdate("INSERT INTO BANK_ACCOUNTS VALUES("+ id +", "+ bankAccount + ", " + 0 + ")");
+            System.out.println("Account 2 inserted");
+            statement.executeUpdate("INSERT INTO USERS VALUES(" + id + ", '" + username + "', '" + pw + "'");
+            System.out.println("User inserted");
             closeConnection();
             return Integer.parseInt(id);
         } catch (

@@ -68,7 +68,7 @@ public class SignupPanel extends JPanel {
         streetText = new JTextField();
 
         homeLabel = new JLabel();
-        homeLabel.setText("Home :");
+        homeLabel.setText("Home (Only digits) :");
         homeText = new JTextField();
 
         apartmentLabel = new JLabel();
@@ -80,11 +80,11 @@ public class SignupPanel extends JPanel {
         postCodeText = new JTextField();
 
         birthdateLabel = new JLabel();
-        birthdateLabel.setText("Birth Date :");
+        birthdateLabel.setText("Birth Date (YYYY/MM/DD):");
         birthdateText = new JTextField();
 
         phoneLabel = new JLabel();
-        phoneLabel.setText("Phone Number :");
+        phoneLabel.setText("Phone Number (9 digits):");
         phoneText = new JTextField();
 
         passwordLabel = new JLabel();
