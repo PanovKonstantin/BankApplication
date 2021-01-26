@@ -1,5 +1,5 @@
 import java.sql.*;
-import oracle.jdbc.*;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.HashMap;
 import java.util.Map;
@@ -222,14 +222,25 @@ public class ConnectionDatabase {
     public Object[][] getTransactionHistory(int id){
         openConnection();
         try (Statement statement = conn.createStatement()){
+            String bankAccount = new String("");
             ResultSet rs = statement.executeQuery("SELECT bank_account FROM bank_accounts WHERE CLIENT_ID = " + id);
-            while(rs.next()){String bankAccount = rs.getString(BANK_ACCOUNT);}
-            rs = statement.executeQuery("SELECT * FROM TRANSACTIONS");
+            ArrayList<Object[]> data = new ArrayList<>();
+            ArrayList<String> set = new ArrayList<>();
+            while(rs.next()){bankAccount = rs.getString(BANK_ACCOUNT);}
+            rs = statement.executeQuery("SELECT * FROM TRANSACTIONS WHERE SOURCE = " + bankAccount + "  OR TARGET = " + bankAccount + "ORDER BY TRANSACTION_DATE DESC");
             while(rs.next()){
-                //NEED TO CREATE ARRAYLIST
-                
+                set.clear();
+                set.add(rs.getString("source"));
+                set.add(rs.getString("target"));
+                set.add(rs.getString("amount"));
+                set.add(rs.getString("transaction_date"));
+                data.add(set.toArray());
             }
-
+            Object[][] ret = new Object[data.size()][];
+            for (int i = 0; i < data.size(); i++){
+                ret[i] = data.get(i);
+            }
+            return ret;
 
         } catch (SQLException e) {
             System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
@@ -237,7 +248,7 @@ public class ConnectionDatabase {
             e.printStackTrace();
         }
         closeConnection();
-        return new Object[][] { { "vxvc", "xqerz", "wfda", 2222, "0000-00-00" } };
+        return new Object[][] { { } };
     }
 
     public int makeTransaction(String id, String amount, String target) {

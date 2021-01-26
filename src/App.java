@@ -80,6 +80,7 @@ public class App extends JFrame {
 
     public void loginAccount(int id) {
         identificator = id;
+        refresh();
         loginSignupTP.setVisible(false);
         homeTP.setVisible(true);
         exit.setVisible(true);
