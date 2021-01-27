@@ -293,7 +293,7 @@ public class ConnectionDatabase {
             e.printStackTrace();
         }
         closeConnection();
-        return -2;
+        return -3;
     }
 
 }

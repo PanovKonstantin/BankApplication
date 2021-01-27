@@ -73,6 +73,9 @@ public class App extends JFrame {
 
             int result = conn.makeTransaction(id, amount, target);
             switch (result) {
+                case -3:
+                    homeTP.home.inform("Connection failed!");
+                    break;
                 case -2:
                     homeTP.home.inform("Not enough funds!");
                     break;
