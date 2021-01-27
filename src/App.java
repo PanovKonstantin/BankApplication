@@ -15,6 +15,7 @@ public class App extends JFrame {
         super("Bank Application");
         conn = new ConnectionDatabase();
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setLocation(350, 80);
         setLayout(new BorderLayout());
 
         loginSignupTP = new LoginSignupTabbedPane();
