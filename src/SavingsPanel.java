@@ -6,7 +6,7 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.*;
 
-public class SavingsPanel extends JPanel{
+public class SavingsPanel extends JPanel {
     static final long serialVersionUID = 42L;
     JLabel amountLabel;
     JTextField amount;
@@ -16,7 +16,7 @@ public class SavingsPanel extends JPanel{
     DefaultTableModel savingsTM;
     ButtonGroup bg;
     transient Object[] headerRow;
-    static final String SELECT = "Select"; 
+    static final String SELECT = "Select";
     static final String NOINFO = "No information";
 
     SavingsPanel() {
@@ -27,23 +27,25 @@ public class SavingsPanel extends JPanel{
         amountLabel = new JLabel("Amount");
         amount = new JTextField();
         savingsTM = new DefaultTableModel();
-        headerRow = new Object[] { "Name", "Number", "Balance", "Percent", SELECT};
+        headerRow = new Object[] { "Name", "Number", "Balance", "Percent", SELECT };
 
         savings = new JTable(savingsTM) {
             static final long serialVersionUID = 42L;
+
             @Override
             public void tableChanged(TableModelEvent tme) {
                 super.tableChanged(tme);
                 repaint();
             }
+
             @Override
-            public boolean isCellEditable(int row, int col) {return col == 4;}
+            public boolean isCellEditable(int row, int col) {
+                return col == 4;
+            }
         };
-        savingsTM.setDataVector(
-                new Object[][] { { NOINFO, NOINFO, NOINFO, NOINFO, new JRadioButton() }},
-                headerRow);
+        savingsTM.setDataVector(new Object[][] { { NOINFO, NOINFO, NOINFO, NOINFO, new JRadioButton() } }, headerRow);
         bg = new ButtonGroup();
-        for (int i = 0; i < savings.getRowCount(); i++){
+        for (int i = 0; i < savings.getRowCount(); i++) {
             bg.add((JRadioButton) savingsTM.getValueAt(i, 4));
         }
         savings.getColumn(SELECT).setCellRenderer(new RadioButtonRenderer());
@@ -64,9 +66,9 @@ public class SavingsPanel extends JPanel{
         transferTo.addActionListener(l);
     }
 
-    public void refresh(Object[][] data){
+    public void refresh(Object[][] data) {
         savingsTM.setDataVector(data, headerRow);
-        for(int i = 0; i < savings.getRowCount(); i++){
+        for (int i = 0; i < savings.getRowCount(); i++) {
             savings.setValueAt(new JRadioButton(), i, 4);
             bg.add((JRadioButton) savingsTM.getValueAt(i, 4));
         }
