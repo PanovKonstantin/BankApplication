@@ -345,11 +345,15 @@ public class ConnectionDatabase {
     }
 
     public int makeTransaction(String id, String amount, String target) {
+        int clientID = Integer.parseInt(id);
+        int amnt = Integer.parseInt(amount);
+        int trgt = Integer.parseInt(target);
+        if (amnt <= 0 || target.length() != 6) return -4;
         openConnection();
         try (CallableStatement callstatement = conn.prepareCall("{call make_transaction(?, ?, ?, ?)}")) {
-            callstatement.setString(1, id);
-            callstatement.setString(2, amount);
-            callstatement.setString(3, target);
+            callstatement.setInt(1, clientID);
+            callstatement.setInt(2, amnt);
+            callstatement.setInt(3, trgt);
             callstatement.registerOutParameter(4, Types.NUMERIC);
             return callstatement.executeUpdate();
         } catch (SQLException e) {
