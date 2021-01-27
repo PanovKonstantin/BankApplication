@@ -75,6 +75,9 @@ public class App extends JFrame {
 
             int result = conn.makeTransaction(id, amount, target);
             switch (result) {
+                case -4:
+                    homeTP.home.inform("Input is incorrect!");
+                    break;
                 case -3:
                     homeTP.home.inform("Connection failed!");
                     break;
@@ -82,27 +85,6 @@ public class App extends JFrame {
                     homeTP.home.inform("Not enough funds!");
                     break;
                 case -1:
-                    homeTP.home.inform("Transaction failed!");
-                    break;
-                default:
-                    homeTP.home.inform("Transfer succeeded!");
-                    refresh();
-                    homeTP.home.clear();
-                    break;
-            }
-        });
-
-        homeTP.home.addActionListener(a -> {
-            String target = homeTP.home.target.getText();
-            String amount = homeTP.home.amount.getText();
-            String id = Integer.toString(identificator);
-
-            int result = conn.makeTransaction(id, amount, target);
-            switch (result) {
-                case -1:
-                    homeTP.home.inform("Not enough funds!");
-                    break;
-                case -2:
                     homeTP.home.inform("Transaction failed!");
                     break;
                 default:
