@@ -176,5 +176,6 @@ public class SignupPanel extends JPanel {
         passwordText.setText("");
         pwRepeatText.setText("");
         submit.setText("");
+        message.setText("");
     }
 }

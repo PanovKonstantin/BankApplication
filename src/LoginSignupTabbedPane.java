@@ -42,7 +42,9 @@ public class LoginSignupTabbedPane extends JTabbedPane {
         loginPanel.addActionListener(l);
     }
 
-    public void addSignupActionListener(ActionListener l) {signupPanel.addActionListener(l);}
+    public void addSignupActionListener(ActionListener l) {
+        signupPanel.addActionListener(l);
+    }
 
     public void clear() {
         loginPanel.clear();

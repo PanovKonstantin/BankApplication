@@ -130,6 +130,7 @@ public class ConnectionDatabase {
         closeConnection();
         return -1;
     }
+
     public Map getClientData(int id) {
         Map<String, String> clientData = new HashMap<>();
         String clientID = Integer.toString(id);
@@ -213,7 +214,7 @@ public class ConnectionDatabase {
             }
 
             rs = statement.executeQuery("SELECT * FROM COUNTRIES WHERE COUNTRY_ID=" + countryID);
-            while (rs.next()){
+            while (rs.next()) {
                 country = rs.getString("COUNTRY_NAME");
             }
             address = country + ", " + city + ", " + street + " " + home + ", " + appartment + ", " + postCode;
@@ -228,9 +229,58 @@ public class ConnectionDatabase {
         closeConnection();
         return clientData;
     }
-    public Object[][] getSavingsAccount(int id) {
-        return new Object[][] { { "Konto 1", 123123, 1000, 3, "" }, { "Konto 2", 1123, 13000, 11, "" },
-                { "Konto 3", 11, 22, 33, "" }, { "Konto 3", 11, 22, 33, "" } };
+
+    public Object[][] getSavingAccounts(int id) {
+        openConnection();
+        try (Statement statement = conn.createStatement()) {
+            String bankAccount = "";
+            String savingBankAccount = "";
+            String bankAccountProfit = "";
+            String bankAccountFunds = "";
+            String savingBankAccountFunds = "";
+            String savingBankAccountProfit = "";
+            ResultSet rs = statement.executeQuery(
+                    "SELECT * FROM BANK_ACCOUNTS JOIN CLIENTS using(client_id) JOIN client_type using(type_id) WHERE CLIENT_ID ="
+                            + id);
+            while (rs.next()) {
+                bankAccount = rs.getString(BANK_ACCOUNT);
+                bankAccountFunds = rs.getString("AVAILABLE_FUNDS");
+                bankAccountProfit = rs.getString("ACCOUNT_PROFIT");
+                savingBankAccountProfit = rs.getString("SAVING_ACCOUNT_PROFIT");
+            }
+            ArrayList<Object[]> data = new ArrayList<>();
+            ArrayList<String> set = new ArrayList<>();
+            set.add("Main Bank Account");
+            set.add(bankAccount);
+            set.add(bankAccountFunds);
+            set.add(bankAccountProfit);
+            data.add(set.toArray());
+            int savingBankAccountCounter = 1;
+            rs = statement.executeQuery("SELECT * FROM SAVING_BANK_ACCOUNTS WHERE CLIENT_ID =" + id);
+            while (rs.next()) {
+                savingBankAccount = rs.getString(BANK_ACCOUNT);
+                savingBankAccountFunds = rs.getString("AVAILABLE_FUNDS");
+                set.clear();
+                set.add("Saving Bank Account " + Integer.toString(savingBankAccountCounter));
+                set.add(savingBankAccount);
+                set.add(savingBankAccountFunds);
+                set.add(savingBankAccountProfit);
+                data.add(set.toArray());
+                savingBankAccountCounter++;
+            }
+            closeConnection();
+            Object[][] ret = new Object[data.size()][];
+            for (int i = 0; i < data.size(); i++) {
+                ret[i] = data.get(i);
+            }
+            return ret;
+        } catch (SQLException e) {
+            System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        closeConnection();
+        return new Object[][] { { "Konto 1", 1, 2, 3, "" }, { "Konto 2", 4, 5, 6, "" } };
     }
 
     public Object[][] getTransactionHistory(int id) {
@@ -240,11 +290,13 @@ public class ConnectionDatabase {
             ResultSet rs = statement.executeQuery("SELECT bank_account FROM bank_accounts WHERE CLIENT_ID = " + id);
             ArrayList<Object[]> data = new ArrayList<>();
             ArrayList<String> set = new ArrayList<>();
-            while(rs.next()){bankAccount = rs.getString(BANK_ACCOUNT);}
-            rs = statement.executeQuery("SELECT * FROM TRANSACTIONS WHERE SOURCE = " + bankAccount + "  OR TARGET = " + bankAccount + "ORDER BY TRANSACTION_DATE DESC");
+            while (rs.next()) {
+                bankAccount = rs.getString(BANK_ACCOUNT);
+            }
+            rs = statement.executeQuery("SELECT * FROM TRANSACTIONS WHERE SOURCE = " + bankAccount + "  OR TARGET = "
+                    + bankAccount + "ORDER BY TRANSACTION_DATE DESC");
 
             while (rs.next()) {
-
                 set.clear();
                 set.add(rs.getString("source"));
                 set.add(rs.getString("target"));
@@ -253,7 +305,7 @@ public class ConnectionDatabase {
                 data.add(set.toArray());
             }
             Object[][] ret = new Object[data.size()][];
-            for (int i = 0; i < data.size(); i++){
+            for (int i = 0; i < data.size(); i++) {
                 ret[i] = data.get(i);
             }
             return ret;
@@ -264,12 +316,12 @@ public class ConnectionDatabase {
             e.printStackTrace();
         }
         closeConnection();
-        return new Object[][] { { } };
+        return new Object[][] { {} };
     }
 
     public int makeTransaction(String id, String amount, String target) {
         openConnection();
-        try (CallableStatement  callstatement = conn.prepareCall("{call make_transaction(?, ?, ?, ?)}")) {
+        try (CallableStatement callstatement = conn.prepareCall("{call make_transaction(?, ?, ?, ?)}")) {
             callstatement.setString(1, id);
             callstatement.setString(2, amount);
             callstatement.setString(3, target);

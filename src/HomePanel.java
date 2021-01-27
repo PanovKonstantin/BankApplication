@@ -4,7 +4,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 
-public class HomePanel extends JPanel{
+public class HomePanel extends JPanel {
     static final long serialVersionUID = 42L;
     JLabel balanceLabel;
     JLabel balance;
@@ -25,17 +25,17 @@ public class HomePanel extends JPanel{
         transfer = new JButton("Make transfer to >");
         target = new JTextField();
 
-        
         historyTM = new DefaultTableModel();
-        headerRow = new Object[] {"From", "To", "Amount", "Date" };
+        headerRow = new Object[] { "From", "To", "Amount", "Date" };
         history = new JTable(historyTM) {
             static final long serialVersionUID = 42L;
+
             @Override
-            public boolean isCellEditable(int row, int col) {return false;}
+            public boolean isCellEditable(int row, int col) {
+                return false;
+            }
         };
-        historyTM.setDataVector(
-                new Object[][] {{NOINFO, NOINFO, NOINFO, NOINFO, NOINFO}},
-                headerRow);
+        historyTM.setDataVector(new Object[][] { { NOINFO, NOINFO, NOINFO, NOINFO, NOINFO } }, headerRow);
         JScrollPane scrollPane = new JScrollPane(history);
 
         JPanel p = new JPanel(new BorderLayout());
@@ -62,9 +62,12 @@ public class HomePanel extends JPanel{
         add(scrollPane, BorderLayout.CENTER);
 
     }
-    public void refresh(Object[][] data){
-        if (data[0].length > 0) historyTM.setDataVector(data, headerRow);
-        else historyTM.setDataVector(new Object[][] {{NOINFO, NOINFO, NOINFO, NOINFO, NOINFO}}, headerRow);
+
+    public void refresh(Object[][] data) {
+        if (data[0].length > 0)
+            historyTM.setDataVector(data, headerRow);
+        else
+            historyTM.setDataVector(new Object[][] { { NOINFO, NOINFO, NOINFO, NOINFO, NOINFO } }, headerRow);
     }
 
     public void addActionListener(ActionListener l) {
@@ -73,7 +76,7 @@ public class HomePanel extends JPanel{
         transfer.addActionListener(l);
     }
 
-    public void clear(){
+    public void clear() {
         message.setText("");
         target.setText("");
         amount.setText("");

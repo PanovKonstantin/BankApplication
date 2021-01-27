@@ -23,7 +23,7 @@ public class App extends JFrame {
             int id = conn.loginUser(info[0], info[1]);
             switch (id) {
                 case -1:
-                    loginSignupTP.loginInform("Invalide username.. ");
+                    loginSignupTP.loginInform("Login error!");
                     break;
                 default:
                     loginAccount(id);
@@ -72,7 +72,7 @@ public class App extends JFrame {
             String amount = homeTP.home.amount.getText();
             String id = Integer.toString(identificator);
 
-            int result = conn.makeTransfer(id, amount, target);
+            int result = conn.makeTransaction(id, amount, target);
             switch (result) {
                 case -1:
                     homeTP.home.inform("Not enough funds!");
@@ -121,7 +121,6 @@ public class App extends JFrame {
         Map<String, String> clientData = conn.getClientData(identificator);
 
         homeTP.home.balance.setText(clientData.get("BANK_ACCOUNT_FUNDS"));
-
         homeTP.info.name.setText(clientData.get("FIRST_NAME"));
         homeTP.info.surname.setText(clientData.get("SECOND_NAME"));
         homeTP.info.birthdate.setText(clientData.get("BIRTH_DATE"));
@@ -131,6 +130,7 @@ public class App extends JFrame {
         homeTP.info.username.setText(clientData.get("USERNAME"));
         homeTP.info.address.setText(clientData.get("ADDRESS"));
 
+        homeTP.savings.refresh(conn.getSavingAccounts(identificator));
         homeTP.home.refresh(conn.getTransactionHistory(identificator));
     }
 

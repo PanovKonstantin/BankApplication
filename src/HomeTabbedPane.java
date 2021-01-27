@@ -16,7 +16,6 @@ public class HomeTabbedPane extends JTabbedPane {
         info = new InfoPanel();
         add("Information", info);
 
-
         savings = new SavingsPanel();
         savings.addActionListener(e -> {
         });
