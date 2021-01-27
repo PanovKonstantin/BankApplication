@@ -63,11 +63,9 @@ public class HomePanel extends JPanel {
 
     }
 
-    public void refresh(Object[][] data) {
-        if (data[0].length > 0)
-            historyTM.setDataVector(data, headerRow);
-        else
-            historyTM.setDataVector(new Object[][] { { NOINFO, NOINFO, NOINFO, NOINFO, NOINFO } }, headerRow);
+    public void refresh(Object[][] data){
+        if (data.length > 0) historyTM.setDataVector(data, headerRow);
+        else historyTM.setDataVector(new Object[][] {{NOINFO, NOINFO, NOINFO, NOINFO, NOINFO}}, headerRow);
     }
 
     public void addActionListener(ActionListener l) {

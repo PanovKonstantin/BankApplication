@@ -25,6 +25,9 @@ public class App extends JFrame {
                 case -1:
                     loginSignupTP.loginInform("Login error!");
                     break;
+                case -2:
+                    loginSignupTP.loginInform("Incorrect username or password.");
+                    break;
                 default:
                     loginAccount(id);
                     break;
@@ -35,7 +38,25 @@ public class App extends JFrame {
             int id = conn.addClient(info);
             switch (id) {
                 case -1:
-                    loginSignupTP.signupInform("Error..");
+                    loginSignupTP.signupInform("Unknown error occured.");
+                    break;
+                case -2:
+                    loginSignupTP.signupInform("Unknown country.");
+                    break;
+                case -3:
+                    loginSignupTP.signupInform("Invalid date of birth.");
+                    break;
+                case -4:
+                    loginSignupTP.signupInform("Invalid phone number.");
+                    break;
+                case -5:
+                    loginSignupTP.signupInform("Username is taken.");
+                    break;
+                case -6:
+                    loginSignupTP.signupInform("Passwords do not match.");
+                    break;
+                case -7:
+                    loginSignupTP.signupInform("Home field can contain only numbers.");
                     break;
                 default:
                     loginAccount(id);

@@ -40,60 +40,60 @@ public class SignupPanel extends JPanel {
         super(new GridLayout(15, 2));
         firstNameLabel = new JLabel();
         firstNameLabel.setText("First Name:");
-        firstNameText = new JTextField();
+        firstNameText = new JTextField("");
 
         secondNameLabel = new JLabel();
         secondNameLabel.setText("Second Name :");
-        secondNameText = new JTextField();
+        secondNameText = new JTextField("");
 
         userNameLabel = new JLabel();
 
         userNameLabel.setText("User Name :");
-        userNameText = new JTextField();
+        userNameText = new JTextField("");
 
         emailLabel = new JLabel();
         emailLabel.setText("Email :");
-        emailText = new JTextField();
+        emailText = new JTextField("");
 
         countryLabel = new JLabel();
         countryLabel.setText("Country :");
-        countryText = new JTextField();
+        countryText = new JTextField("");
 
         cityLabel = new JLabel();
         cityLabel.setText("City :");
-        cityText = new JTextField();
+        cityText = new JTextField("");
 
         streetLabel = new JLabel();
         streetLabel.setText("Street :");
-        streetText = new JTextField();
+        streetText = new JTextField("");
 
         homeLabel = new JLabel();
-        homeLabel.setText("Home :");
-        homeText = new JTextField();
+        homeLabel.setText("Home (Only digits) :");
+        homeText = new JTextField("");
 
         apartmentLabel = new JLabel();
         apartmentLabel.setText("Apartment :");
-        apartmentText = new JTextField();
+        apartmentText = new JTextField("");
 
         postCodeLabel = new JLabel();
         postCodeLabel.setText("Post code :");
-        postCodeText = new JTextField();
+        postCodeText = new JTextField("");
 
         birthdateLabel = new JLabel();
-        birthdateLabel.setText("Birth Date :");
-        birthdateText = new JTextField();
+        birthdateLabel.setText("Birth Date (DD/MM/YYYY):");
+        birthdateText = new JTextField("");
 
         phoneLabel = new JLabel();
-        phoneLabel.setText("Phone Number :");
-        phoneText = new JTextField();
+        phoneLabel.setText("Phone Number (9 digits):");
+        phoneText = new JTextField("");
 
         passwordLabel = new JLabel();
         passwordLabel.setText("Password :");
-        passwordText = new JPasswordField();
+        passwordText = new JPasswordField("");
 
         pwRepeatLabel = new JLabel();
         pwRepeatLabel.setText("Repeat Password :");
-        pwRepeatText = new JPasswordField();
+        pwRepeatText = new JPasswordField("");
 
         submit = new JButton("Signup");
         message = new JLabel();
