@@ -54,7 +54,8 @@ public class ConnectionDatabase {
         String home = info[11];
         String appartment = info[12];
         String postCode = info[13];
-        if (!pw.equals(pwRepeat)) return -6;
+        if (!pw.equals(pwRepeat))
+            return -6;
         openConnection();
 
         try (Statement statement = conn.createStatement()) {
@@ -64,28 +65,36 @@ public class ConnectionDatabase {
             String countryID = "";
             int rnd;
 
-            ResultSet rs = statement.executeQuery("SELECT country_id FROM countries WHERE country_name = UPPER('"+ country + "')");
-            while (rs.next()) countryID = rs.getString(1);
-            if(countryID.length() == 0) return -2;
+            ResultSet rs = statement
+                    .executeQuery("SELECT country_id FROM countries WHERE country_name = UPPER('" + country + "')");
+            while (rs.next())
+                countryID = rs.getString(1);
+            if (countryID.length() == 0)
+                return -2;
 
-            try(CallableStatement  callstatement = conn.prepareCall("{? = call test_date(?)}")){
+            try (CallableStatement callstatement = conn.prepareCall("{? = call test_date(?)}")) {
                 callstatement.registerOutParameter(1, Types.VARCHAR);
                 callstatement.setString(2, birthdate);
                 callstatement.execute();
-                if(callstatement.getString(1).equals("Invalid")) return -3;
+                if (callstatement.getString(1).equals("Invalid"))
+                    return -3;
             }
-            
-            if(!phone.matches("\\d+")||phone.length()!=9) return -4;
+
+            if (!phone.matches("\\d+") || phone.length() != 9)
+                return -4;
             rs = statement.executeQuery("SELECT username FROM users");
-            while (rs.next()) if (username.equals(rs.getString(1))) return -5;
+            while (rs.next())
+                if (username.equals(rs.getString(1)))
+                    return -5;
 
-            if(!home.matches("\\d+")) return -7;
+            if (!home.matches("\\d+"))
+                return -7;
 
-            if(countryID.length() == 0) return -2;
-
+            if (countryID.length() == 0)
+                return -2;
 
             rs = statement.executeQuery("SELECT SEQ_CLIENTS.NEXTVAL FROM DUAL");
-            
+
             while (rs.next()) {
                 id = rs.getString(1);
             }
@@ -96,22 +105,25 @@ public class ConnectionDatabase {
                 allAccounts.add(rs.getString(BANK_ACCOUNT)); // getting bank account
             }
             rnd = 100000 + rand.nextInt(900000);
-            while(allAccounts.contains(bankAccount) || rnd/100000 == 5){
+            while (allAccounts.contains(bankAccount) || rnd / 100000 == 5) {
                 rnd = 100000 + rand.nextInt(900000);
                 bankAccount = String.valueOf(rnd);
             }
             bankAccount = String.valueOf(rnd);
             rs = statement.executeQuery("SELECT SEQ_ADDRESSES.NEXTVAL FROM DUAL");
-            while(rs.next()) addressID = rs.getString(1);
+            while (rs.next())
+                addressID = rs.getString(1);
 
-            statement.executeUpdate("INSERT INTO ADDRESSES VALUES("+ addressID + " , " + countryID + " , '" + city + "','"+ street + "', "+ home + " , '"+appartment+"', '"+postCode+"')");
+            statement.executeUpdate("INSERT INTO ADDRESSES VALUES(" + addressID + " , " + countryID + " , '" + city
+                    + "','" + street + "', " + home + " , '" + appartment + "', '" + postCode + "')");
             System.out.println("Address inserted");
             statement.executeUpdate("INSERT INTO CLIENTS VALUES(" + id + ",'" + firstName + "','" + secondName + "','"
                     + birthdate + "'," + phone + ",'" + email + "', " + addressID + ", 1)");
             System.out.println("Client inserted");
-            statement.executeUpdate("INSERT INTO ALL_ACCOUNTS VALUES("+ bankAccount +", "+ 1 + ", SYSDATE, NULL, " + id + " )");
+            statement.executeUpdate(
+                    "INSERT INTO ALL_ACCOUNTS VALUES(" + bankAccount + ", " + 1 + ", SYSDATE, NULL, " + id + " )");
             System.out.println("Account 1 inserted");
-            statement.executeUpdate("INSERT INTO BANK_ACCOUNTS VALUES("+ id +", "+ bankAccount + ", " + 0 + ")");
+            statement.executeUpdate("INSERT INTO BANK_ACCOUNTS VALUES(" + id + ", " + bankAccount + ", " + 0 + ")");
             System.out.println("Account 2 inserted");
             statement.executeUpdate("INSERT INTO USERS VALUES(" + id + ", '" + username + "', '" + pw + "')");
             System.out.println("User inserted");
@@ -305,12 +317,12 @@ public class ConnectionDatabase {
             e.printStackTrace();
         }
         closeConnection();
-        return new Object[][] { { "Konto 1", 1, 2, 3, "" }, { "Konto 2", 4, 5, 6, "" } };
+        return new Object[][] {};
     }
 
     public Object[][] getTransactionHistory(int id) {
         openConnection();
-        try (Statement statement = conn.createStatement()){
+        try (Statement statement = conn.createStatement()) {
             String bankAccount = "";
             ResultSet rs = statement.executeQuery("SELECT bank_account FROM bank_accounts WHERE CLIENT_ID = " + id);
             ArrayList<Object[]> data = new ArrayList<>();
@@ -346,7 +358,7 @@ public class ConnectionDatabase {
 
     public int makeTransaction(String id, String amount, String target) {
         openConnection();
-        try (CallableStatement callstatement = conn.prepareCall("{call make_transaction(?, ?, ?, ?)}")) {
+        try (CallableStatement  callstatement = conn.prepareCall("{call make_transaction(?, ?, ?, ?)}")) {
             callstatement.setString(1, id);
             callstatement.setString(2, amount);
             callstatement.setString(3, target);
@@ -358,7 +370,7 @@ public class ConnectionDatabase {
             e.printStackTrace();
         }
         closeConnection();
-        return -2;
+        return -3;
     }
 
 }
