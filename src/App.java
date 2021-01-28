@@ -10,6 +10,7 @@ public class App extends JFrame {
     LoginSignupTabbedPane loginSignupTP;
     HomeTabbedPane homeTP;
     int identificator;
+    Map<String, String> clientData;
 
     App() {
         super("Bank Application");
@@ -95,6 +96,138 @@ public class App extends JFrame {
             }
         });
 
+        homeTP.info.addActionListener(e -> {
+            String username = homeTP.info.username.getText();
+            String phone = homeTP.info.phone.getText();
+            String email = homeTP.info.email.getText();
+            String name = homeTP.info.name.getText();
+            String surname = homeTP.info.surname.getText();
+            String message = "";
+            final String connfailed = "Connection failed.";
+            boolean correct = true;
+            switch(conn.changeClientUsername(username, identificator)){
+                case -1:
+                    homeTP.info.info.setText(connfailed);
+                    return;
+                case -2:
+                    message += "Username is taken. ";
+                    correct = false;
+                    break;
+                default: break;
+            }
+            if(!phone.matches("\\d+")||phone.length()!=9){
+                message += "Phone number is incorrect. ";
+                correct = false;
+            }
+            if(!correct){
+                homeTP.info.info.setText(message);
+                homeTP.info.info.setVisible(true);
+                return;
+            }
+            if(conn.changeClientEmail(email, identificator) == -1){
+                homeTP.info.info.setText(connfailed);
+                return;
+            }
+            if(conn.changeClientName(name, identificator) == -1){
+                homeTP.info.info.setText(connfailed);
+                return;
+            }
+            if(conn.changeClientSurame(surname, identificator) == -1){
+                homeTP.info.info.setText(connfailed);
+                return;
+            }
+            if(conn.changeClientPhone(phone, identificator) == -1){
+                homeTP.info.info.setText(connfailed);
+                return;
+            }
+            refresh();
+            homeTP.info.editbutton.setText("Edit");
+            homeTP.info.username.setEditable(false);
+            homeTP.info.email.setEditable(false);
+            homeTP.info.name.setEditable(false);
+            homeTP.info.surname.setEditable(false);
+            homeTP.info.phone.setEditable(false);
+            homeTP.info.info.setVisible(false);
+            homeTP.info.savebutton.setEnabled(false);
+
+        });
+        homeTP.info.editbutton.addActionListener(e -> {
+            if(e.getActionCommand().equals("Edit")){
+                homeTP.info.editbutton.setText("Cancel");
+                homeTP.info.username.setEditable(true);
+                homeTP.info.email.setEditable(true);
+                homeTP.info.name.setEditable(true);
+                homeTP.info.surname.setEditable(true);
+                homeTP.info.phone.setEditable(true);
+                homeTP.info.savebutton.setEnabled(true);
+            } else {
+                refresh();
+                homeTP.info.editbutton.setText("Edit");
+                homeTP.info.username.setEditable(false);
+                homeTP.info.email.setEditable(false);
+                homeTP.info.name.setEditable(false);
+                homeTP.info.surname.setEditable(false);
+                homeTP.info.phone.setEditable(false);
+                homeTP.info.info.setVisible(false);
+                homeTP.info.savebutton.setEnabled(false);
+            }
+        });
+        homeTP.savings.transferTo.addActionListener(e->{
+            String target = "";
+            String target_funds = "";
+            String amount = homeTP.savings.amount.getText();
+            String funds = "";
+            if (amount.equals("") || amount.equals("0")){
+                homeTP.savings.amount.setText("");
+                return;
+            }
+            funds = homeTP.home.balance.getText();
+            if (Integer.parseInt(funds) < Integer.parseInt(amount)){
+                homeTP.savings.amount.setText("");
+                return;
+            }
+            for(int i = 0; i < homeTP.savings.savings.getRowCount(); i++){
+                if (((JRadioButton)homeTP.savings.savings.getValueAt(i, 3)).isSelected()){
+                    target = (String)homeTP.savings.savings.getValueAt(i, 0);
+                    target_funds = (String)homeTP.savings.savings.getValueAt(i, 1);
+                    amount = homeTP.savings.amount.getText();
+                    funds = Integer.toString(Integer.parseInt(funds) - Integer.parseInt(amount));
+                    target_funds = Integer.toString(Integer.parseInt(target_funds) + Integer.parseInt(amount));
+                    conn.tarnsferUpdate(clientData.get("BANK_ACCOUNT"), target, funds, target_funds);
+                    refresh();
+                }
+            }
+            homeTP.savings.amount.setText("");
+            return;
+        });
+        homeTP.savings.transferFrom.addActionListener(e->{
+            String target = "";
+            String target_funds = "";
+            String amount = homeTP.savings.amount.getText();
+            String funds = "";
+            if (amount.equals("") || amount.equals("0")){
+                homeTP.savings.amount.setText("");
+                return;
+            }
+            for(int i = 0; i < homeTP.savings.savings.getRowCount(); i++){
+                if (((JRadioButton)homeTP.savings.savings.getValueAt(i, 3)).isSelected()){
+                    target = (String)homeTP.savings.savings.getValueAt(i, 0);
+                    target_funds = (String)homeTP.savings.savings.getValueAt(i, 1);
+                    amount = homeTP.savings.amount.getText();
+                    funds = homeTP.home.balance.getText();
+                    if (Integer.parseInt(target_funds) < Integer.parseInt(amount)){
+                        homeTP.savings.amount.setText("");
+                        return;
+                    }
+                    funds = Integer.toString(Integer.parseInt(funds) + Integer.parseInt(amount));
+                    target_funds = Integer.toString(Integer.parseInt(target_funds) - Integer.parseInt(amount));
+                    conn.tarnsferUpdate(clientData.get("BANK_ACCOUNT"), target, funds, target_funds);
+                    refresh();
+                }
+            }
+            homeTP.savings.amount.setText("");
+            return;
+        });
         homeTP.setVisible(false);
         exit = new JButton("Logout");
         exit.addActionListener(a -> logoutAccount());
@@ -125,7 +258,7 @@ public class App extends JFrame {
     }
 
     public void refresh() {
-        Map<String, String> clientData = conn.getClientData(identificator);
+        clientData = conn.getClientData(identificator);
 
         homeTP.home.balance.setText(clientData.get("BANK_ACCOUNT_FUNDS"));
         homeTP.info.name.setText(clientData.get("FIRST_NAME"));

@@ -27,7 +27,8 @@ public class SavingsPanel extends JPanel {
         amountLabel = new JLabel("Amount");
         amount = new JTextField();
         savingsTM = new DefaultTableModel();
-        headerRow = new Object[] { "Name", "Number", "Balance", "Percent", SELECT };
+        headerRow = new Object[] {"Number", "Balance", "Percent", SELECT};
+        bg = new ButtonGroup();
 
         savings = new JTable(savingsTM) {
             static final long serialVersionUID = 42L;
@@ -39,17 +40,8 @@ public class SavingsPanel extends JPanel {
             }
 
             @Override
-            public boolean isCellEditable(int row, int col) {
-                return col == 4;
-            }
+            public boolean isCellEditable(int row, int col) {return col == 3;}
         };
-        savingsTM.setDataVector(new Object[][] { { NOINFO, NOINFO, NOINFO, NOINFO, new JRadioButton() } }, headerRow);
-        bg = new ButtonGroup();
-        for (int i = 0; i < savings.getRowCount(); i++) {
-            bg.add((JRadioButton) savingsTM.getValueAt(i, 4));
-        }
-        savings.getColumn(SELECT).setCellRenderer(new RadioButtonRenderer());
-        savings.getColumn(SELECT).setCellEditor(new RadioButtonEditor(new JCheckBox()));
         JScrollPane sp = new JScrollPane(savings);
         add(sp, BorderLayout.CENTER);
 
@@ -67,13 +59,20 @@ public class SavingsPanel extends JPanel {
     }
 
     public void refresh(Object[][] data) {
-        savingsTM.setDataVector(data, headerRow);
-        for (int i = 0; i < savings.getRowCount(); i++) {
-            savings.setValueAt(new JRadioButton(), i, 4);
-            bg.add((JRadioButton) savingsTM.getValueAt(i, 4));
+        if (data.length == 0) savingsTM.setDataVector(new Object[][] {{NOINFO, NOINFO, NOINFO, NOINFO}}, headerRow);
+        else {
+            for (int i = 0; i < savings.getRowCount(); i++){
+                bg.remove((JRadioButton) savings.getValueAt(i, 3));
+            }
+            for (int i = 0; i < data.length; i++) {
+                data[i][3] = new JRadioButton();
+                bg.add((JRadioButton) data[i][3]);
+            }
+            savingsTM.setDataVector(data, headerRow);
+            savings.getColumn(SELECT).setCellRenderer(new RadioButtonRenderer());
+            savings.getColumn(SELECT).setCellEditor(new RadioButtonEditor(new JCheckBox()));
         }
     }
-
 }
 
 class RadioButtonRenderer implements TableCellRenderer {
