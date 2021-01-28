@@ -95,6 +95,82 @@ public class App extends JFrame {
             }
         });
 
+        homeTP.info.addActionListener(e -> {
+            String username = homeTP.info.username.getText();
+            String phone = homeTP.info.phone.getText();
+            String email = homeTP.info.email.getText();
+            String name = homeTP.info.name.getText();
+            String surname = homeTP.info.surname.getText();
+            String message = "";
+            final String connfailed = "Connection failed.";
+            boolean correct = true;
+            switch(conn.changeClientUsername(username, identificator)){
+                case -1:
+                    homeTP.info.info.setText(connfailed);
+                    return;
+                case -2:
+                    message += "Username is taken. ";
+                    correct = false;
+                    break;
+                default: break;
+            }
+            if(!phone.matches("\\d+")||phone.length()!=9){
+                message += "Phone number is incorrect. ";
+                correct = false;
+            }
+            if(!correct){
+                homeTP.info.info.setText(message);
+                homeTP.info.info.setVisible(true);
+                return;
+            }
+            if(conn.changeClientEmail(email, identificator) == -1){
+                homeTP.info.info.setText(connfailed);
+                return;
+            }
+            if(conn.changeClientName(name, identificator) == -1){
+                homeTP.info.info.setText(connfailed);
+                return;
+            }
+            if(conn.changeClientSurame(surname, identificator) == -1){
+                homeTP.info.info.setText(connfailed);
+                return;
+            }
+            if(conn.changeClientPhone(phone, identificator) == -1){
+                homeTP.info.info.setText(connfailed);
+                return;
+            }
+            refresh();
+            homeTP.info.editbutton.setText("Edit");
+            homeTP.info.username.setEditable(false);
+            homeTP.info.email.setEditable(false);
+            homeTP.info.name.setEditable(false);
+            homeTP.info.surname.setEditable(false);
+            homeTP.info.phone.setEditable(false);
+            homeTP.info.info.setVisible(false);
+            homeTP.info.savebutton.setEnabled(false);
+
+        });
+        homeTP.info.editbutton.addActionListener(e -> {
+            if(e.getActionCommand().equals("Edit")){
+                homeTP.info.editbutton.setText("Cancel");
+                homeTP.info.username.setEditable(true);
+                homeTP.info.email.setEditable(true);
+                homeTP.info.name.setEditable(true);
+                homeTP.info.surname.setEditable(true);
+                homeTP.info.phone.setEditable(true);
+                homeTP.info.savebutton.setEnabled(true);
+            } else {
+                refresh();
+                homeTP.info.editbutton.setText("Edit");
+                homeTP.info.username.setEditable(false);
+                homeTP.info.email.setEditable(false);
+                homeTP.info.name.setEditable(false);
+                homeTP.info.surname.setEditable(false);
+                homeTP.info.phone.setEditable(false);
+                homeTP.info.info.setVisible(false);
+                homeTP.info.savebutton.setEnabled(false);
+            }
+        });
         homeTP.setVisible(false);
         exit = new JButton("Logout");
         exit.addActionListener(a -> logoutAccount());

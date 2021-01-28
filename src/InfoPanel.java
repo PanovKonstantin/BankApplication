@@ -3,7 +3,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class InfoPanel extends JPanel implements ActionListener {
+public class InfoPanel extends JPanel{
     static final long serialVersionUID = 42L;
     JTextField accountid;
     JTextField username;
@@ -67,14 +67,13 @@ public class InfoPanel extends JPanel implements ActionListener {
         birthdateLabel.setText("Birthdate:");
         phoneLabel = new JLabel();
         phoneLabel.setText("Phone number:");
-        info = new JLabel("Information is not correct.");
+        info = new JLabel("");
         info.setVisible(false);
 
         editbutton = new JButton("Edit");
         savebutton = new JButton("Save");
         savebutton.setEnabled(false);
-        editbutton.addActionListener(this);
-        savebutton.addActionListener(this);
+        
 
         add(accountidLabel);
         add(accountid);
@@ -97,38 +96,5 @@ public class InfoPanel extends JPanel implements ActionListener {
         add(info);
     }
 
-    public void actionPerformed(ActionEvent e) {
-        switch (e.getActionCommand()) {
-            case "Edit":
-                accountid.setEditable(true);
-                username.setEditable(true);
-                email.setEditable(true);
-                address.setEditable(true);
-                birthdate.setEditable(true);
-                phone.setEditable(true);
-                savebutton.setEnabled(true);
-                break;
-            case "Save":
-                if (isInformationCorrect(phone.getText())) {
-                    accountid.setEditable(false);
-                    username.setEditable(false);
-                    email.setEditable(false);
-                    address.setEditable(false);
-                    birthdate.setEditable(false);
-                    phone.setEditable(false);
-                    savebutton.setEnabled(false);
-                    info.setVisible(false);
-                } else {
-                    info.setVisible(true);
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
-    public boolean isInformationCorrect(String a) {
-        return a.length() == 11;
-    }
-
+    public void addActionListener(ActionListener e) {savebutton.addActionListener(e);}
 }
