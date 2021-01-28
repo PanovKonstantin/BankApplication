@@ -10,6 +10,7 @@ public class App extends JFrame {
     LoginSignupTabbedPane loginSignupTP;
     HomeTabbedPane homeTP;
     int identificator;
+    Map<String, String> clientData;
 
     App() {
         super("Bank Application");
@@ -171,6 +172,62 @@ public class App extends JFrame {
                 homeTP.info.savebutton.setEnabled(false);
             }
         });
+        homeTP.savings.transferTo.addActionListener(e->{
+            String target = "";
+            String target_funds = "";
+            String amount = homeTP.savings.amount.getText();
+            String funds = "";
+            if (amount.equals("") || amount.equals("0")){
+                homeTP.savings.amount.setText("");
+                return;
+            }
+            funds = homeTP.home.balance.getText();
+            if (Integer.parseInt(funds) < Integer.parseInt(amount)){
+                homeTP.savings.amount.setText("");
+                return;
+            }
+            for(int i = 0; i < homeTP.savings.savings.getRowCount(); i++){
+                if (((JRadioButton)homeTP.savings.savings.getValueAt(i, 3)).isSelected()){
+                    target = (String)homeTP.savings.savings.getValueAt(i, 0);
+                    target_funds = (String)homeTP.savings.savings.getValueAt(i, 1);
+                    amount = homeTP.savings.amount.getText();
+                    funds = Integer.toString(Integer.parseInt(funds) - Integer.parseInt(amount));
+                    target_funds = Integer.toString(Integer.parseInt(target_funds) + Integer.parseInt(amount));
+                    conn.tarnsferUpdate(clientData.get("BANK_ACCOUNT"), target, funds, target_funds);
+                    refresh();
+                }
+            }
+            homeTP.savings.amount.setText("");
+            return;
+        });
+        homeTP.savings.transferFrom.addActionListener(e->{
+            String target = "";
+            String target_funds = "";
+            String amount = homeTP.savings.amount.getText();
+            String funds = "";
+            if (amount.equals("") || amount.equals("0")){
+                homeTP.savings.amount.setText("");
+                return;
+            }
+            for(int i = 0; i < homeTP.savings.savings.getRowCount(); i++){
+                if (((JRadioButton)homeTP.savings.savings.getValueAt(i, 3)).isSelected()){
+                    target = (String)homeTP.savings.savings.getValueAt(i, 0);
+                    target_funds = (String)homeTP.savings.savings.getValueAt(i, 1);
+                    amount = homeTP.savings.amount.getText();
+                    funds = homeTP.home.balance.getText();
+                    if (Integer.parseInt(target_funds) < Integer.parseInt(amount)){
+                        homeTP.savings.amount.setText("");
+                        return;
+                    }
+                    funds = Integer.toString(Integer.parseInt(funds) + Integer.parseInt(amount));
+                    target_funds = Integer.toString(Integer.parseInt(target_funds) - Integer.parseInt(amount));
+                    conn.tarnsferUpdate(clientData.get("BANK_ACCOUNT"), target, funds, target_funds);
+                    refresh();
+                }
+            }
+            homeTP.savings.amount.setText("");
+            return;
+        });
         homeTP.setVisible(false);
         exit = new JButton("Logout");
         exit.addActionListener(a -> logoutAccount());
@@ -201,7 +258,7 @@ public class App extends JFrame {
     }
 
     public void refresh() {
-        Map<String, String> clientData = conn.getClientData(identificator);
+        clientData = conn.getClientData(identificator);
 
         homeTP.home.balance.setText(clientData.get("BANK_ACCOUNT_FUNDS"));
         homeTP.info.name.setText(clientData.get("FIRST_NAME"));
