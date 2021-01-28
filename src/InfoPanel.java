@@ -73,25 +73,7 @@ public class InfoPanel extends JPanel{
         editbutton = new JButton("Edit");
         savebutton = new JButton("Save");
         savebutton.setEnabled(false);
-        editbutton.addActionListener(e -> {
-            if(e.getActionCommand().equals("Edit")){
-                editbutton.setText("Cancel");
-                username.setEditable(true);
-                email.setEditable(true);
-                name.setEditable(true);
-                surname.setEditable(true);
-                phone.setEditable(true);
-                savebutton.setEnabled(true);
-            } else {
-                editbutton.setText("Edit");
-                username.setEditable(false);
-                email.setEditable(false);
-                name.setEditable(false);
-                surname.setEditable(false);
-                phone.setEditable(false);
-                savebutton.setEnabled(false);
-            }
-        });
+        
 
         add(accountidLabel);
         add(accountid);
@@ -115,9 +97,4 @@ public class InfoPanel extends JPanel{
     }
 
     public void addActionListener(ActionListener e) {savebutton.addActionListener(e);}
-
-    public boolean isInformationCorrect(String a) {
-        return a.length() == 11;
-    }
-
 }

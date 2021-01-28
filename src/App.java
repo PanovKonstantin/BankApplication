@@ -139,6 +139,7 @@ public class App extends JFrame {
                 homeTP.info.info.setText(connfailed);
                 return;
             }
+            refresh();
             homeTP.info.editbutton.setText("Edit");
             homeTP.info.username.setEditable(false);
             homeTP.info.email.setEditable(false);
@@ -147,8 +148,28 @@ public class App extends JFrame {
             homeTP.info.phone.setEditable(false);
             homeTP.info.info.setVisible(false);
             homeTP.info.savebutton.setEnabled(false);
-            refresh();
 
+        });
+        homeTP.info.editbutton.addActionListener(e -> {
+            if(e.getActionCommand().equals("Edit")){
+                homeTP.info.editbutton.setText("Cancel");
+                homeTP.info.username.setEditable(true);
+                homeTP.info.email.setEditable(true);
+                homeTP.info.name.setEditable(true);
+                homeTP.info.surname.setEditable(true);
+                homeTP.info.phone.setEditable(true);
+                homeTP.info.savebutton.setEnabled(true);
+            } else {
+                refresh();
+                homeTP.info.editbutton.setText("Edit");
+                homeTP.info.username.setEditable(false);
+                homeTP.info.email.setEditable(false);
+                homeTP.info.name.setEditable(false);
+                homeTP.info.surname.setEditable(false);
+                homeTP.info.phone.setEditable(false);
+                homeTP.info.info.setVisible(false);
+                homeTP.info.savebutton.setEnabled(false);
+            }
         });
         homeTP.setVisible(false);
         exit = new JButton("Logout");
