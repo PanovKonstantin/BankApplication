@@ -143,7 +143,6 @@ public class ConnectionDatabase {
                 tablePassword = rs.getString(PW);
                 if (username.equals(tableUsername) && pw.equals(tablePassword)) {
                     id = rs.getInt("CLIENT_ID");
-                    System.out.println(id);
                     closeConnection();
                     return id;
                 }
@@ -260,40 +259,22 @@ public class ConnectionDatabase {
     public Object[][] getSavingAccounts(int id) {
         openConnection();
         try (Statement statement = conn.createStatement()) {
-            String bankAccount = "";
             String savingBankAccount = "";
-            String bankAccountProfit = "";
-            String bankAccountFunds = "";
             String savingBankAccountFunds = "";
             String savingBankAccountProfit = "";
-            ResultSet rs = statement.executeQuery(
-                    "SELECT * FROM BANK_ACCOUNTS JOIN CLIENTS using(client_id) JOIN client_type using(type_id) WHERE CLIENT_ID ="
-                            + id);
-            while (rs.next()) {
-                bankAccount = rs.getString(BANK_ACCOUNT);
-                bankAccountFunds = rs.getString("AVAILABLE_FUNDS");
-                bankAccountProfit = rs.getString("ACCOUNT_PROFIT");
-                savingBankAccountProfit = rs.getString("SAVING_ACCOUNT_PROFIT");
-            }
             ArrayList<Object[]> data = new ArrayList<>();
-            ArrayList<String> set = new ArrayList<>();
-            set.add("Main Bank Account");
-            set.add(bankAccount);
-            set.add(bankAccountFunds);
-            set.add(bankAccountProfit);
-            data.add(set.toArray());
-            int savingBankAccountCounter = 1;
-            rs = statement.executeQuery("SELECT * FROM SAVING_BANK_ACCOUNTS WHERE CLIENT_ID =" + id);
+            ArrayList<Object> set = new ArrayList<>();
+            ResultSet rs = statement.executeQuery("SELECT * FROM SAVING_BANK_ACCOUNTS JOIN CLIENTS USING(CLIENT_ID) JOIN CLIENT_TYPE USING(TYPE_ID) WHERE CLIENT_ID =" + id);
             while (rs.next()) {
                 savingBankAccount = rs.getString(BANK_ACCOUNT);
                 savingBankAccountFunds = rs.getString("AVAILABLE_FUNDS");
+                savingBankAccountProfit = rs.getString("SAVING_ACCOUNT_PROFIT");
                 set.clear();
-                set.add("Saving Bank Account " + Integer.toString(savingBankAccountCounter));
                 set.add(savingBankAccount);
                 set.add(savingBankAccountFunds);
-                set.add(savingBankAccountProfit);
+                set.add(savingBankAccountProfit + "%");
+                set.add(new Object());
                 data.add(set.toArray());
-                savingBankAccountCounter++;
             }
             closeConnection();
             Object[][] ret = new Object[data.size()][];
@@ -307,7 +288,7 @@ public class ConnectionDatabase {
             e.printStackTrace();
         }
         closeConnection();
-        return new Object[][] { { "Konto 1", 1, 2, 3, "" }, { "Konto 2", 4, 5, 6, "" } };
+        return new Object[][] {{}};
     }
 
     public Object[][] getTransactionHistory(int id) {
@@ -436,5 +417,21 @@ public class ConnectionDatabase {
             e.printStackTrace();
         }
         return -1;
+    }
+    public int tarnsferUpdate(String mainAcc, String savingsAcc, String mainBalance, String savingsBalance){
+        openConnection();
+        try(Statement statement = conn.createStatement()){
+            statement.executeUpdate("UPDATE SAVING_BANK_ACCOUNTS SET AVAILABLE_FUNDS = "+ savingsBalance +" WHERE BANK_ACCOUNT = "+savingsAcc);
+            
+            statement.executeUpdate("UPDATE BANK_ACCOUNTS SET AVAILABLE_FUNDS = "+ mainBalance +" WHERE BANK_ACCOUNT = "+mainAcc);
+            
+            return 0;
+        } catch (SQLException e) {
+            System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+
     }
 }
