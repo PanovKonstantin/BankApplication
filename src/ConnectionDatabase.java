@@ -104,17 +104,16 @@ public class ConnectionDatabase {
             rs = statement.executeQuery("SELECT SEQ_ADDRESSES.NEXTVAL FROM DUAL");
             while(rs.next()) addressID = rs.getString(1);
 
-            statement.executeUpdate("INSERT INTO ADDRESSES VALUES("+ addressID + " , " + countryID + " , '" + city + "','"+ street + "', "+ home + " , '"+appartment+"', '"+postCode+"')");
-            System.out.println("Address inserted");
-            statement.executeUpdate("INSERT INTO CLIENTS VALUES(" + id + ",'" + firstName + "','" + secondName + "','"
-                    + birthdate + "'," + phone + ",'" + email + "', " + addressID + ", 1)");
-            System.out.println("Client inserted");
+            statement.executeUpdate("INSERT INTO ADDRESSES VALUES("+ addressID+ " , " + countryID + " , '" + city + "','"+ street + "', "+ home+ " , '"+appartment+"', '"+postCode+"')");
+
+            statement.executeUpdate("INSERT INTO CLIENTS VALUES(" + id + ",'" + firstName + "','" + secondName + "','"+ birthdate + "'," + phone + ",'" + email + "', " + addressID + ", 1)");
+
             statement.executeUpdate("INSERT INTO ALL_ACCOUNTS VALUES("+ bankAccount +", "+ 1 + ", SYSDATE, NULL, " + id + " )");
-            System.out.println("Account 1 inserted");
+
             statement.executeUpdate("INSERT INTO BANK_ACCOUNTS VALUES("+ id +", "+ bankAccount + ", " + 0 + ")");
-            System.out.println("Account 2 inserted");
+
             statement.executeUpdate("INSERT INTO USERS VALUES(" + id + ", '" + username + "', '" + pw + "')");
-            System.out.println("User inserted");
+
             closeConnection();
             return Integer.parseInt(id);
         } catch (
@@ -134,14 +133,17 @@ public class ConnectionDatabase {
 
     public int loginUser(String username, String pw) {
         openConnection();
+        String tableUsername = "";
+        String tablePassword = "";
+        int id = -1;
         try (Statement statement = conn.createStatement()) {
             ResultSet rs = statement.executeQuery("SELECT * FROM USERS");
             while (rs.next()) {
-                int id = rs.getInt("CLIENT_ID");
-
-                String tableUsername = rs.getString(USERNAME);
-                String tablePassword = rs.getString(PW);
+                tableUsername = rs.getString(USERNAME);
+                tablePassword = rs.getString(PW);
                 if (username.equals(tableUsername) && pw.equals(tablePassword)) {
+                    id = rs.getInt("CLIENT_ID");
+                    System.out.println(id);
                     closeConnection();
                     return id;
                 }
@@ -153,7 +155,7 @@ public class ConnectionDatabase {
             e.printStackTrace();
         }
         closeConnection();
-        return -1;
+        return id;
     }
 
     public Map getClientData(int id) {
@@ -365,4 +367,74 @@ public class ConnectionDatabase {
         return -3;
     }
 
+    public int changeClientUsername(String username, int id){
+        String oldUsername = "";
+        openConnection();
+        try(Statement statement = conn.createStatement()){
+            ResultSet rs = statement.executeQuery("SELECT username from users where client_id =" + id);
+            while(rs.next()) oldUsername = rs.getString(USERNAME);
+            if (oldUsername.equals(username)) return -3;
+            rs = statement.executeQuery("SELECT username from users");
+            while(rs.next()) if(username.equals(rs.getString(USERNAME))) return -2;
+            statement.executeUpdate("UPDATE USERS SET username = '"+ username +"' WHERE client_id ="+id);
+            return 0;
+        } catch (SQLException e) {
+            System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        return -1;
+    }
+
+    public int changeClientEmail(String email, int id){
+        openConnection();
+        try(Statement statement = conn.createStatement()){
+            statement.executeUpdate("UPDATE CLIENTS SET email = '"+ email +"' WHERE client_id ="+id);
+            return 0;
+        } catch (SQLException e) {
+            System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public int changeClientName(String name, int id){
+        openConnection();
+        try(Statement statement = conn.createStatement()){
+            statement.executeUpdate("UPDATE CLIENTS SET first_name = '"+ name +"' WHERE client_id ="+id);
+            return 0;
+        } catch (SQLException e) {
+            System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public int changeClientSurame(String surname, int id){
+        openConnection();
+        try(Statement statement = conn.createStatement()){
+            statement.executeUpdate("UPDATE CLIENTS SET second_name = '"+ surname +"' WHERE client_id ="+id);
+            return 0;
+        } catch (SQLException e) {
+            System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+    public int changeClientPhone(String phone, int id){
+        openConnection();
+        try(Statement statement = conn.createStatement()){
+            statement.executeUpdate("UPDATE CLIENTS SET phone_number = '"+ phone +"' WHERE client_id ="+id);
+            return 0;
+        } catch (SQLException e) {
+            System.err.format(SQLSTATE, e.getSQLState(), e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
 }
